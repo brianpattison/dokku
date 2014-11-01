@@ -11,7 +11,7 @@ DOKKU_ROOT ?= /home/dokku
 all:
 	# Type "make install" to install.
 
-install: dependencies stack copyfiles plugins version
+install: dependencies stack copyfiles plugin-dependencies plugins version
 
 copyfiles:
 	cp dokku /usr/local/bin/dokku
@@ -20,6 +20,9 @@ copyfiles:
 
 version:
 	git describe --tags > ${DOKKU_ROOT}/VERSION  2> /dev/null || echo '~${DOKKU_VERSION} ($(shell date -uIminutes))' > ${DOKKU_ROOT}/VERSION
+
+plugin-dependencies: pluginhook
+	dokku plugins-install-dependencies
 
 plugins: pluginhook docker
 	dokku plugins-install
@@ -36,22 +39,28 @@ pluginhook:
 	dpkg -i /tmp/pluginhook_0.1.0_amd64.deb
 
 docker: aufs
+	apt-get install -qq -y curl
 	egrep -i "^docker" /etc/group || groupadd docker
 	usermod -aG docker dokku
-	curl https://get.docker.io/gpg | apt-key add -
+	curl --silent https://get.docker.io/gpg | apt-key add -
 	echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list
 	apt-get update
-	apt-get install -y lxc-docker
+ifdef DOCKER_VERSION
+	apt-get install -qq -y lxc-docker-${DOCKER_VERSION}
+else
+	apt-get install -qq -y lxc-docker
+endif
 	sleep 2 # give docker a moment i guess
 
 aufs:
-	lsmod | grep aufs || modprobe aufs || apt-get install -y linux-image-extra-`uname -r`
+	lsmod | grep aufs || modprobe aufs || apt-get install -qq -y linux-image-extra-`uname -r` > /dev/null
 
 stack:
+	@echo "Start building buildstep"
 ifdef BUILD_STACK
-	@docker images | grep progrium/buildstep || docker build -t progrium/buildstep ${STACK_URL}
+	@docker images | grep progrium/buildstep || (git clone ${STACK_URL} /tmp/buildstep && docker build -t progrium/buildstep /tmp/buildstep && rm -rf /tmp/buildstep)
 else
-	@docker images | grep progrium/buildstep || curl ${PREBUILT_STACK_URL} | gunzip -cd | docker import - progrium/buildstep
+	@docker images | grep progrium/buildstep || curl --silent -L ${PREBUILT_STACK_URL} | gunzip -cd | docker import - progrium/buildstep
 endif
 
 count:
