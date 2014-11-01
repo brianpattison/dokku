@@ -3,62 +3,70 @@ set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
 case "$1" in
   delete)
     if [[ -z $2 ]]; then
-        echo "Please specify an app to delete"
-        exit 1
+      echo "Please specify an app to delete"
+      exit 1
     fi
     APP="$2"; IMAGE="app/$APP";
     if [[ ! -d "$DOKKU_ROOT/$APP" ]]; then
-        echo "App does not exist"
-        exit 1
+      echo "App does not exist"
+      exit 1
     fi
 
     pluginhook pre-delete $APP
-    ID=$(< "$DOKKU_ROOT/$APP/CONTAINER")
+    if [[ -f "$DOKKU_ROOT/$APP/CONTAINER" ]]; then
+      ID=$(< "$DOKKU_ROOT/$APP/CONTAINER")
 
-    docker stop $ID > /dev/null
+      docker stop $ID > /dev/null
+      docker rm $ID  > /dev/null
+    fi
+
     docker images | grep $IMAGE | awk '{print $3}' | xargs docker rmi &> /dev/null &
-    docker rm $ID  > /dev/null
 
     pluginhook post-delete $APP
     ;;
 
   logs)
     if [[ -z $2 ]]; then
-        echo "Please specify an app to run the command on"
-        exit 1
+      echo "Please specify an app to run the command on"
+      exit 1
     fi
     APP="$2";
     if [[ ! -d "$DOKKU_ROOT/$APP" ]]; then
-        echo "App $APP does not exist"
-        exit 1
+      echo "App $APP does not exist"
+      exit 1
     fi
-      
-    CONTAINER=$(<$DOKKU_ROOT/$APP/CONTAINER)
-    docker logs $CONTAINER | tail -n 100
-    if [[ $3 == "-t" ]]; then
-      docker attach $CONTAINER
+
+    if [[ -f "$DOKKU_ROOT/$APP/CONTAINER" ]]; then
+      CONTAINER=$(<$DOKKU_ROOT/$APP/CONTAINER)
+      docker logs $CONTAINER | tail -n 100
+      if [[ $3 == "-t" ]]; then
+        docker attach $CONTAINER
+      fi
+    else
+      echo "Application's container not found"
     fi
     ;;
 
   run)
     if [[ -z $2 ]]; then
-        echo "Please specify an app to run the command on"
-        exit 1
+      echo "Please specify an app to run the command on"
+      exit 1
     fi
     APP="$2"; IMAGE="app/$APP"
     if [[ ! -d "$DOKKU_ROOT/$APP" ]]; then
-        echo "App $APP does not exist"
-        exit 1
+      echo "App $APP does not exist"
+      exit 1
     fi
     shift 2
-    docker run -i -t $IMAGE /exec "$@"
+    DOCKER_ARGS=$(: | pluginhook docker-args $APP)
+    docker run -i -t $DOCKER_ARGS $IMAGE /exec "$@"
     ;;
 
   url)
     APP="$2";
     if [[ ! -d "$DOKKU_ROOT/$APP" ]]; then
-        echo "App $APP does not exist"
-        exit 1
+      echo "App $APP does not exist"
+      exit 1
     fi
 
     if [[ -f "$DOKKU_ROOT/$APP/URL" ]]; then
