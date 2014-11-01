@@ -2,8 +2,8 @@ DOKKU_VERSION = v0.2.0
 
 SSHCOMMAND_URL ?= https://raw.github.com/progrium/sshcommand/master/sshcommand
 PLUGINHOOK_URL ?= https://s3.amazonaws.com/progrium-pluginhook/pluginhook_0.1.0_amd64.deb
-STACK_URL ?= github.com/progrium/buildstep
-PREBUILT_STACK_URL ?= https://s3.amazonaws.com/progrium-dokku/progrium_buildstep_79cf6805cf.tgz
+STACK_URL ?= https://github.com/progrium/buildstep.git
+PREBUILT_STACK_URL ?= https://github.com/progrium/buildstep/releases/download/2014-03-08/2014-03-08_429d4a9deb.tar.gz
 DOKKU_ROOT ?= /home/dokku
 
 .PHONY: all install copyfiles version plugins dependencies sshcommand pluginhook docker aufs stack count
@@ -41,7 +41,7 @@ docker: aufs
 	curl https://get.docker.io/gpg | apt-key add -
 	echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list
 	apt-get update
-	apt-get install -y lxc-docker 
+	apt-get install -y lxc-docker
 	sleep 2 # give docker a moment i guess
 
 aufs:
