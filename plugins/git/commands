@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
 
+create_bare_repository() {
+  git init --bare "$2" > /dev/null
+  PRERECEIVE_HOOK="$2/hooks/pre-receive"
+  cat > "$PRERECEIVE_HOOK" <<EOF
+#!/usr/bin/env bash
+set -e; set -o pipefail;
+cat | DOKKU_ROOT="$DOKKU_ROOT" dokku git-hook "$1"
+EOF
+  chmod +x "$PRERECEIVE_HOOK"
+}
+
 case "$1" in
   git-hook)
     APP=$2
@@ -21,22 +32,33 @@ case "$1" in
     APP_PATH=$DOKKU_ROOT/$APP
 
     if [[ $1 == "git-receive-pack" && ! -d $APP_PATH ]]; then
-        git init --bare $APP_PATH > /dev/null
-        PRERECEIVE_HOOK="$APP_PATH/hooks/pre-receive"
-        cat > $PRERECEIVE_HOOK <<EOF
+      git init --bare $APP_PATH > /dev/null
+      PRERECEIVE_HOOK="$APP_PATH/hooks/pre-receive"
+      cat > $PRERECEIVE_HOOK <<EOF
 #!/usr/bin/env bash
 set -e; set -o pipefail;
 cat | DOKKU_ROOT="$DOKKU_ROOT" dokku git-hook $APP
 EOF
-        chmod +x $PRERECEIVE_HOOK
+      chmod +x $PRERECEIVE_HOOK
     fi
 
     args=$@
     git-shell -c "$args"
     ;;
 
+  create)
+    APP="$2"
+    APP_PATH=$DOKKU_ROOT/$APP
+
+    [[ -d "$APP_PATH/refs" ]] && echo "$APP: already exist"
+    create_bare_repository "$APP" "$APP_PATH"
+    echo "Application $APP created!"
+    ;;
+
   help)
-    cat
+    cat && cat <<EOF
+    create <app>                 Create shallow app
+EOF
     ;;
 esac
 
