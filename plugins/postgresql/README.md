@@ -42,7 +42,7 @@ Create a new DB:
 $ dokku postgresql:create foo            # Server side
 $ ssh dokku@server postgresql:create foo # Client side
 
------> PostgreSQL container created: postgresql/foo
+-----> PostgreSQL container created: postgres/foo
 
        Host: 172.17.42.1
        User: 'root'
@@ -112,7 +112,7 @@ Restore a database:
 dokku postgresql:restore foo < foo.sql
 ```
 
-In case Dokku says `pg_dump not found` when dumping or restoring database: 
+In case Dokku says `pg_dump not found` when dumping or restoring database:
 ```
 sudo apt-get install postgresql-client-9.3
 ```
