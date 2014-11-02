@@ -1,4 +1,6 @@
 #!/bin/bash
 
-# Pull docker image
-docker pull postgres
+# Build docker image
+git clone https://github.com/brianpattison/dokku-pg-dockerfiles /tmp/dokku-pg-dockerfiles
+docker build -q=true -t brianpattison/postgresql /tmp/dokku-pg-dockerfiles
+rm -rf /tmp/dokku-pg-dockerfiles
