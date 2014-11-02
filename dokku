@@ -9,7 +9,7 @@ export PLUGIN_PATH=${PLUGIN_PATH:="/var/lib/dokku/plugins"}
 
 case "$1" in
   receive)
-    APP="$2"; IMAGE="app/$APP"
+    APP="$2"; IMAGE="dokku/$APP"
     echo "-----> Building $APP ..."
     cat | dokku build $APP $IMAGE
     echo "-----> Releasing $APP ..."
@@ -87,7 +87,7 @@ case "$1" in
   deploy:all)
     for app in $(ls -d $DOKKU_ROOT/*/); do
       APP=$(basename $app);
-      IMAGE="app/$APP"
+      IMAGE="dokku/$APP"
       dokku deploy $APP $IMAGE
     done
     ;;

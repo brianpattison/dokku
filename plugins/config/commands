@@ -49,7 +49,7 @@ config_styled_hash () {
 }
 
 config_restart_app() {
-  APP="$1"; IMAGE="app/$APP"
+  APP="$1"; IMAGE="dokku/$APP"
 
   echo "-----> Releasing $APP ..."
   dokku release $APP $IMAGE
