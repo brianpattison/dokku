@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Create the directory to house the log files:
+mkdir -p /var/log/dokku
+chown dokku:dokku /var/log/dokku
