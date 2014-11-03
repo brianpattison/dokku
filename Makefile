@@ -1,9 +1,8 @@
 DOKKU_VERSION = v0.2.0
 
-SSHCOMMAND_URL ?= https://raw.github.com/progrium/sshcommand/master/sshcommand
-PLUGINHOOK_URL ?= https://s3.amazonaws.com/progrium-pluginhook/pluginhook_0.1.0_amd64.deb
-STACK_URL ?= https://github.com/progrium/buildstep.git
-PREBUILT_STACK_URL ?= https://github.com/progrium/buildstep/releases/download/2014-03-08/2014-03-08_429d4a9deb.tar.gz
+SSHCOMMAND_URL ?= https://raw.github.com/brianpattison/sshcommand/master/sshcommand
+PLUGINHOOK_URL ?= http://brianpattison.s3.amazonaws.com/pluginhook_0.1.0_amd64.deb
+STACK_URL ?= https://github.com/brianpattison/buildstep.git
 DOKKU_ROOT ?= /home/dokku
 
 .PHONY: all install copyfiles version plugins dependencies sshcommand pluginhook docker aufs stack count
@@ -57,11 +56,7 @@ aufs:
 
 stack:
 	@echo "Start building buildstep"
-ifdef BUILD_STACK
 	@docker images | grep progrium/buildstep || (git clone ${STACK_URL} /tmp/buildstep && docker build -t progrium/buildstep /tmp/buildstep && rm -rf /tmp/buildstep)
-else
-	@docker images | grep progrium/buildstep || curl --silent -L ${PREBUILT_STACK_URL} | gunzip -cd | docker import - progrium/buildstep
-endif
 
 count:
 	@echo "Core lines:"
