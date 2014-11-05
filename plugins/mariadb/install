@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Build docker image
+git clone https://github.com/brianpattison/dokku-md-dockerfiles /tmp/dokku-pg-dockerfiles
+docker build -q=true -t brianpattison/mariadb /tmp/dokku-pg-dockerfiles
+rm -rf /tmp/dokku-pg-dockerfiles
+
+# Install mysql-client
+apt-get install -y mysql-client
