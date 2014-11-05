@@ -4,4 +4,4 @@
 docker pull dokkuinstaller/postgres
 
 # Install postgres-client
-apt-get install -y postgres-client
+apt-get install -y postgresql-client
