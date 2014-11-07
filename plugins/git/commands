@@ -52,7 +52,7 @@ EOF
 
 		[[ -d "$APP_PATH/refs" ]] && echo "$APP: already exist"
 		create_bare_repository "$APP" "$APP_PATH"
-		echo "/" > $APP_PATH/CHECKS
+		echo "/						HTTP/1.1 200 OK" > $APP_PATH/CHECKS
 		echo "Application $APP created!"
 		;;
 

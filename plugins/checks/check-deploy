@@ -6,17 +6,17 @@
 # settings (NAME=VALUE) and check instructions.
 #
 # The format of a check instruction is a path, optionally followed by the
-# expected content.  For example:
+# expected content.	 For example:
 #
-#   /                       My Amazing App
-#   /stylesheets/index.css  .body
-#   /scripts/index.js       $(function()
-#   /images/logo.png
+#	/						My Amazing App
+#	/stylesheets/index.css	.body
+#	/scripts/index.js		$(function()
+#	/images/logo.png
 #
 # To check an application that supports multiple hostnames, use relative URLs
 # that include the hostname, for example:
 #
-#  //admin.example.com     Admin Dashboard
+#  //admin.example.com	   Admin Dashboard
 #  //static.example.com/logo.png
 #
 # You can also specify the protocol to explicitly check HTTPS requests.
@@ -27,8 +27,8 @@
 # You can change these by setting WAIT and TIMEOUT to different values, for
 # example:
 #
-#   WAIT=30     # Wait 1/2 minute
-#   TIMEOUT=60  # Timeout after a minute
+#	WAIT=30		# Wait 1/2 minute
+#	TIMEOUT=60	# Timeout after a minute
 #
 
 set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
@@ -52,16 +52,16 @@ TIMEOUT="${DOKKU_CHECKS_TIMEOUT:-30}"
 TMPDIR=$(mktemp -d /tmp/CHECKS.XXXXX)
 docker cp $CONTAINERID:/app/CHECKS $TMPDIR 2> /dev/null || true
 if [[ ! -s "${TMPDIR}/CHECKS" ]] ; then
-    echo "       CHECKS file not found in container. skipping checks."
-    rm -rf $TMPDIR
-    exit 0
+	echo "		 CHECKS file not found in container. skipping checks."
+	rm -rf $TMPDIR
+	exit 0
 else
-    FILENAME=${TMPDIR}/CHECKS
+	FILENAME=${TMPDIR}/CHECKS
 
-    function cleanup() {
-      rm -rf $TMPDIR
-    }
-    trap cleanup EXIT
+	function cleanup() {
+	  rm -rf $TMPDIR
+	}
+	trap cleanup EXIT
 fi
 
 
@@ -70,11 +70,11 @@ exec < "$FILENAME"
 while read LINE ; do
   # Name/value pair
   if [[ "$LINE" =~ ^.+= ]] ; then
-    TRIM=${LINE%#*}
-    NAME=${TRIM%=*}
-    VALUE=${TRIM#*=}
-    [[ "$NAME" = "WAIT" ]]    && WAIT=$VALUE
-    [[ "$NAME" = "TIMEOUT" ]] && TIMEOUT=$VALUE
+	TRIM=${LINE%#*}
+	NAME=${TRIM%=*}
+	VALUE=${TRIM#*=}
+	[[ "$NAME" = "WAIT" ]]	  && WAIT=$VALUE
+	[[ "$NAME" = "TIMEOUT" ]] && TIMEOUT=$VALUE
   fi
 done
 
@@ -83,65 +83,64 @@ echo "-----> Waiting $WAIT seconds ..."
 sleep $WAIT
 
 
-# -q           do not use .curlrc (must come first)
+# -q		   do not use .curlrc (must come first)
 # --compressed Test compression handled correctly
-# --fail       Fail on server errors (4xx, 5xx)
+# --fail	   Fail on server errors (4xx, 5xx)
 # --location   Follow redirects
 CURL_OPTIONS="-q --compressed --fail --location --max-time $TIMEOUT"
 
 
 exec < "$FILENAME"
 while read URL EXPECTED ; do
-  # Ignore empty lines and lines starting with #
-  [[ -z "$URL" || "$URL" =~ ^\# ]] && continue
-  # Ignore variables
-  [[ "$URL" =~ ^.+= ]] && continue
+	# Ignore empty lines and lines starting with #
+	[[ -z "$URL" || "$URL" =~ ^\# ]] && continue
+	# Ignore variables
+	[[ "$URL" =~ ^.+= ]] && continue
 
-  if [[ "$URL" =~ ^https?: ]] ; then
-    PROTOCOL=${URL%:*}
-    URL=${URL#*:}
-  else
-    PROTOCOL="http"
-  fi
+	if [[ "$URL" =~ ^https?: ]] ; then
+		PROTOCOL=${URL%:*}
+		URL=${URL#*:}
+	else
+		PROTOCOL="http"
+	fi
 
-  if [[ "$URL" =~ ^//.+ ]] ; then
-    # To test a URL with specific host name, we still make request to localhost,
-    # but we set Host header to $SEND_HOST.
-    #
-    # The pattern is
-    #   //SEND_HOST/PATHNAME
-    UNPREFIXED=${URL#//}
-    HOSTNAME=${UNPREFIXED%%/*}
-    PATHNAME=${UNPREFIXED#$HOSTNAME}
+	if [[ "$URL" =~ ^//.+ ]] ; then
+		# To test a URL with specific host name, we still make request to localhost,
+		# but we set Host header to $SEND_HOST.
+		#
+		# The pattern is
+		#	//SEND_HOST/PATHNAME
+		UNPREFIXED=${URL#//}
+		HOSTNAME=${UNPREFIXED%%/*}
+		PATHNAME=${UNPREFIXED#$HOSTNAME}
 
-    # And how we formulate the CURL request
-    HEADERS="-H Host:$HOSTNAME"
-  else
-    HOSTNAME=localhost
-    PATHNAME=$URL
-  fi
+		# And how we formulate the CURL request
+		HEADERS="-H Host:$HOSTNAME"
+	else
+		HOSTNAME=localhost
+		PATHNAME=$URL
+	fi
 
-  # This URL will show up in the messages
-  URL="$PROTOCOL://$HOSTNAME$PATHNAME"
-  # And how we formulate the CURL request
-  CURL_ARGS="$CURL_OPTIONS $PROTOCOL://localhost:$PORT$PATHNAME $HEADERS"
+	# This URL will show up in the messages
+	URL="$PROTOCOL://$HOSTNAME$PATHNAME"
+	# And how we formulate the CURL request
+	CURL_ARGS="$CURL_OPTIONS $PROTOCOL://localhost:$PORT$PATHNAME $HEADERS"
 
-  echo -e "       \033[37m\033[1mcurl $CURL_ARGS\033[0m"
-  # Capture HTTP response or CURL error message
-  if OUTPUT=$(curl -# $CURL_ARGS 2>&1) ; then
-    # OUTPUT contains the HTTP response
-    if [[ "$OUTPUT" =~ $EXPECTED ]] ; then
-      echo -e "       \033[32m\033[1m$URL => \"$EXPECTED\"\033[0m"
-    else
-      echo -e "       \033[31m\033[1m$URL: expected to but did not find: \"$EXPECTED\"\033[0m" && \
-      exit 1
-    fi
-  else
-    # Failed to connect/no response, OUTPUT contains error message
-    echo -e "       \033[31m\033[1m$OUTPUT\033[0m" &&
-    exit 2
-  fi
-
+	echo -e "		  \033[37m\033[1mcurl $CURL_ARGS\033[0m"
+	# Capture HTTP response or CURL error message
+    if OUTPUT=$(curl -I $CURL_ARGS 2>&1) ; then
+		# OUTPUT contains the HTTP response
+		if [[ "$OUTPUT" =~ $EXPECTED ]] ; then
+			echo -e "		  \033[32m\033[1m$URL => \"$EXPECTED\"\033[0m"
+		else
+			echo -e "		  \033[31m\033[1m$URL: expected to but did not find: \"$EXPECTED\"\033[0m" && \
+			exit 1
+		fi
+	else
+		# Failed to connect/no response, OUTPUT contains error message
+		echo -e "		\033[31m\033[1m$OUTPUT\033[0m" &&
+		exit 2
+	fi
 done
 
 
