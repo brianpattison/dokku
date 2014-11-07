@@ -57,7 +57,7 @@ EOF
 
   help)
     cat && cat <<EOF
-    create <app>                 Create shallow app
+    create <app>																		Create shallow app
 EOF
     ;;
 esac

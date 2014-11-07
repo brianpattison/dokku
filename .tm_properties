@@ -1,0 +1,4 @@
+softTabs = false
+tabSize = 2
+
+TM_STRIP_WHITESPACE_ON_SAVE = true
