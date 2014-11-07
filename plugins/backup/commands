@@ -68,11 +68,11 @@ set -e; case "$1" in
 		;;
 
 	help)
-		cat && cat<<EOF
-		backup:export [file]														Export dokku configuration files
-		backup:import [file]														Import dokku configuration files
+	cat && cat<<EOF
+	backup:export [file]							Export dokku configuration files
+	backup:import [file]							Import dokku configuration files
 EOF
-		;;
+	;;
 
 esac
 

@@ -13,52 +13,52 @@ EOF
 }
 
 case "$1" in
-  git-hook)
-    APP=$2
+	git-hook)
+		APP=$2
 
-    while read oldrev newrev refname
-    do
-      # Only run this script for the master branch. You can remove this
-      # if block if you wish to run it for others as well.
-      if [[ $refname = "refs/heads/master" ]] ; then
-        git archive $newrev | dokku receive $APP | sed -u "s/^/"$'\e[1G'"/"
-      fi
+		while read oldrev newrev refname
+		do
+			# Only run this script for the master branch. You can remove this
+			# if block if you wish to run it for others as well.
+			if [[ $refname = "refs/heads/master" ]] ; then
+				git archive $newrev | dokku receive $APP | sed -u "s/^/"$'\e[1G'"/"
+			fi
 
-    done
-    ;;
+		done
+		;;
 
-  git-*)
-    APP="$(echo $2 | perl -pe 's/(?<!\\)'\''//g' | sed 's/\\'\''/'\''/g')"
-    APP_PATH=$DOKKU_ROOT/$APP
+	git-*)
+		APP="$(echo $2 | perl -pe 's/(?<!\\)'\''//g' | sed 's/\\'\''/'\''/g')"
+		APP_PATH=$DOKKU_ROOT/$APP
 
-    if [[ $1 == "git-receive-pack" && ! -d $APP_PATH ]]; then
-      git init --bare $APP_PATH > /dev/null
-      PRERECEIVE_HOOK="$APP_PATH/hooks/pre-receive"
-      cat > $PRERECEIVE_HOOK <<EOF
+		if [[ $1 == "git-receive-pack" && ! -d $APP_PATH ]]; then
+			git init --bare $APP_PATH > /dev/null
+			PRERECEIVE_HOOK="$APP_PATH/hooks/pre-receive"
+			cat > $PRERECEIVE_HOOK <<EOF
 #!/usr/bin/env bash
 set -e; set -o pipefail;
 cat | DOKKU_ROOT="$DOKKU_ROOT" dokku git-hook $APP
 EOF
-      chmod +x $PRERECEIVE_HOOK
-    fi
+			chmod +x $PRERECEIVE_HOOK
+		fi
 
-    args=$@
-    git-shell -c "$args"
-    ;;
+		args=$@
+		git-shell -c "$args"
+		;;
 
-  create)
-    APP="$2"
-    APP_PATH=$DOKKU_ROOT/$APP
+	create)
+		APP="$2"
+		APP_PATH=$DOKKU_ROOT/$APP
 
-    [[ -d "$APP_PATH/refs" ]] && echo "$APP: already exist"
-    create_bare_repository "$APP" "$APP_PATH"
-    echo "Application $APP created!"
-    ;;
+		[[ -d "$APP_PATH/refs" ]] && echo "$APP: already exist"
+		create_bare_repository "$APP" "$APP_PATH"
+		echo "Application $APP created!"
+		;;
 
-  help)
-    cat && cat <<EOF
-    create <app>																		Create shallow app
+	help)
+	cat && cat <<EOF
+	create <app>									Create an app
 EOF
-    ;;
+	;;
 esac
 
