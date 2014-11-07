@@ -49,8 +49,6 @@ case "$1" in
 		# Launch container
 		ID=$(docker run -v $VOLUME -p 6379 -d $REDIS_IMAGE /bin/start_redis.sh)
 		sleep 4
-		# Link to a potential existing app
-		dokku redis:link $APP $APP
 		echo
 		echo "-----> Redis container created: $REDIS_IMAGE"
 		sleep 1
