@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# Build docker image
-docker pull dokkuinstaller/mariadb
-
-# Install mysql-client
-apt-get install -y mysql-client
