@@ -1,10 +1,27 @@
 #!/usr/bin/env bash
 set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
 APP="$1"; PORT="$2"
-WILDCARD_SSL="$DOKKU_ROOT/ssl"
-SSL="$DOKKU_ROOT/$APP/ssl"
+WILDCARD_SSL="$DOKKU_ROOT/tls"
+SSL="$DOKKU_ROOT/$APP/tls"
+
+PASS_THROUGH_X_HEADERS=$(cat <<EOF
+map \$http_x_forwarded_proto \$x_forwarded_proto {
+  ""      \$scheme;
+  default \$http_x_forwarded_proto;
+}
+map \$http_x_forwarded_for \$x_forwarded_for {
+  ""      \$remote_addr;
+  default \$http_x_forwarded_for;
+}
+map \$http_x_forwarded_port \$x_forwarded_port {
+  ""      \$server_port;
+  default \$http_x_forwarded_port;
+}
+EOF
+)
 
 if [[ -f "$DOKKU_ROOT/VHOST" ]]; then
+
   VHOST=$(< "$DOKKU_ROOT/VHOST")
   SUBDOMAIN=${APP/%\.${VHOST}/}
   if [[ "$APP" == *.* ]] && [[ "$SUBDOMAIN" == "$APP" ]]; then
@@ -13,32 +30,63 @@ if [[ -f "$DOKKU_ROOT/VHOST" ]]; then
     hostname="${APP/\//-}.$VHOST"
   fi
 
-  if [[ -f "$SSL/server.crt" ]] && [[ -f "$SSL/server.key" ]]; then
+  if [[ -e "$SSL/server.crt" ]] && [[ -e "$SSL/server.key" ]]; then
     SSL_INUSE="$SSL"
-  elif  [[ -f "$WILDCARD_SSL/server.crt" ]] && [[ -f "$WILDCARD_SSL/server.key" ]] && [[ $hostname = `openssl x509 -in $WILDCARD_SSL/server.crt -noout -subject | tr '/' '\n' | grep CN= | cut -c4-` ]]; then
+    SSL_DIRECTIVES=$(cat <<EOF
+  ssl_certificate     $SSL_INUSE/server.crt;
+  ssl_certificate_key $SSL_INUSE/server.key;
+  ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+EOF
+)
+  elif  [[ -e "$WILDCARD_SSL/server.crt" ]] && [[ -e "$WILDCARD_SSL/server.key" ]] && [[ $hostname = `openssl x509 -in $WILDCARD_SSL/server.crt -noout -subject | tr '/' '\n' | grep CN= | cut -c4-` ]]; then
     SSL_INUSE="$WILDCARD_SSL"
+    SSL_DIRECTIVES=""
   fi
 
   # ssl based nginx.conf
   if [[ -n "$SSL_INUSE" ]]; then
+
+  SSL_UNSECURE_LOCATION=$(cat <<EOF
+  location    / {
+    proxy_pass  http://$APP;
+    proxy_http_version 1.1;
+    proxy_set_header Host \$http_host;
+    proxy_set_header X-Forwarded-For \$x_forwarded_for;
+    proxy_set_header X-Forwarded-Port \$x_forwarded_port;
+    proxy_set_header X-Forwarded-Proto \$x_forwarded_proto;
+    proxy_set_header X-Request-Start \$msec;
+  }
+EOF
+)
+
+  if [[ -e "$SSL/SSL_FORCE_ALL" ]]; then
+    SSL_UNSECURE_LOCATION=$(cat <<EOF
+  return 301 https://\$server_name\$request_uri;
+EOF
+)
+  fi
+
   cat<<EOF > $DOKKU_ROOT/$APP/nginx.conf
 upstream $APP { server 127.0.0.1:$PORT; }
+
+$PASS_THROUGH_X_HEADERS
+
 server {
+  listen      [::]:80;
   listen      80;
   server_name $hostname;
-  return 301 https://\$host\$request_uri;
+
+$SSL_UNSECURE_LOCATION
 }
 
 server {
-  listen      443;
+  listen      [::]:443 ssl spdy;
+  listen      443 ssl spdy;
   server_name $hostname;
+$SSL_DIRECTIVES
 
-  ssl on;
-  ssl_certificate     $SSL_INUSE/server.crt;
-  ssl_certificate_key $SSL_INUSE/server.key;
-  ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-RC4-SHA:ECDHE-RSA-AES128-SHA:AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH:!CAMELLIA;
-  ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
-  ssl_prefer_server_ciphers on;
+  keepalive_timeout   70;
+  add_header          Alternate-Protocol  443:npn-spdy/2;
 
   location    / {
     proxy_pass  http://$APP;
@@ -59,7 +107,11 @@ else
 # default nginx.conf
   cat<<EOF > $DOKKU_ROOT/$APP/nginx.conf
 upstream $APP { server 127.0.0.1:$PORT; }
+
+$PASS_THROUGH_X_HEADERS
+
 server {
+  listen      [::]:80;
   listen      80;
   server_name $hostname;
   location    / {
@@ -68,9 +120,9 @@ server {
     proxy_set_header Upgrade \$http_upgrade;
     proxy_set_header Connection "upgrade";
     proxy_set_header Host \$http_host;
-    proxy_set_header X-Forwarded-Proto \$scheme;
-    proxy_set_header X-Forwarded-For \$remote_addr;
-    proxy_set_header X-Forwarded-Port \$server_port;
+    proxy_set_header X-Forwarded-For \$x_forwarded_for;
+    proxy_set_header X-Forwarded-Port \$x_forwarded_port;
+    proxy_set_header X-Forwarded-Proto \$x_forwarded_proto;
     proxy_set_header X-Request-Start \$msec;
   }
 }
@@ -78,6 +130,8 @@ EOF
 
   echo "http://$hostname" > "$DOKKU_ROOT/$APP/URL"
   fi
-  pluginhook nginx-pre-reload $APP
+  echo "-----> Running nginx-pre-reload"
+  pluginhook nginx-pre-reload $APP $PORT
+  echo "       Reloading nginx"
   sudo /etc/init.d/nginx reload > /dev/null
 fi
