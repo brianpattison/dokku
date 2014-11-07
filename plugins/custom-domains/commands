@@ -46,8 +46,8 @@ case "$1" in
 
 	help)
 	cat && cat<<EOF
-	domains <app>									display the domains for an app
-	domains:set <app> DOMAIN1 [DOMAIN2 ...]			set one or more domains
+	domains <app>					display the domains for an app
+	domains:set <app> DOMAIN1 [DOMAIN2 ...]		set one or more domains
 EOF
 	;;
 esac

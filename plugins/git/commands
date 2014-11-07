@@ -56,8 +56,9 @@ EOF
 		;;
 
 	help)
+	#						.
 	cat && cat <<EOF
-	create <app>									Create an app
+	create <app>					Create an app
 EOF
 	;;
 esac
