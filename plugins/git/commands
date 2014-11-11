@@ -55,10 +55,9 @@ EOF
 		echo "Application $APP created!"
 		;;
 
-	help)
-	#						.
-	cat && cat <<EOF
-	create <app>					Create an app
+    help)
+    cat && cat <<EOF
+    create <app>					Create an app
 EOF
 	;;
 esac

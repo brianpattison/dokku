@@ -119,13 +119,13 @@ case "$1" in
 		docker logs $ID | tail -n 100
 		;;
 
-	help)
-	cat && cat<<EOF
-	redis:create <rd>				Create a Redis container
-	redis:delete <rd>				Delete specified Redis container
-	redis:info <rd>					Display container information
-	redis:link <app> <rd>				Link an app to a Redis container
-	redis:logs <rd>					Display last logs from Redis container
+    help)
+    cat && cat<<EOF
+    redis:create <rd>				Create a Redis container
+    redis:delete <rd>				Delete specified Redis container
+    redis:info <rd>					Display container information
+    redis:link <app> <rd>				Link an app to a Redis container
+    redis:logs <rd>					Display last logs from Redis container
 EOF
     ;;
 

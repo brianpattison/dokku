@@ -213,17 +213,17 @@ case "$1" in
 		echo "-----> $APP database restored"
 		;;
 
-	help)
-	cat && cat<<EOF
-	postgres:console <db>				Open a PostgreSQL console
-	postgres:create <db>				Create a PostgreSQL container
-	postgres:delete <db>				Delete specified PostgreSQL container
-	postgres:dump <db> > dump_file.sql		Dump database data
-	postgres:info <db>				Display database informations
-	postgres:link <app> <db>			Link an app to a PostgreSQL database
-	postgres:list					Display list of PostgreSQL containers
-	postgres:logs <db>				Display last logs from PostgreSQL container
-	postgres:restore <db> < dump_file.sql		Restore database data from a previous dump
+    help)
+    cat && cat<<EOF
+    postgres:console <db>				Open a PostgreSQL console
+    postgres:create <db>				Create a PostgreSQL container
+    postgres:delete <db>				Delete specified PostgreSQL container
+    postgres:dump <db> > dump_file.sql		Dump database data
+    postgres:info <db>				Display database informations
+    postgres:link <app> <db>			Link an app to a PostgreSQL database
+    postgres:list					Display list of PostgreSQL containers
+    postgres:logs <db>				Display last logs from PostgreSQL container
+    postgres:restore <db> < dump_file.sql		Restore database data from a previous dump
 EOF
     ;;
 
