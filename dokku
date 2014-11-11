@@ -91,7 +91,6 @@ case "$1" in
     if [[ -n "$oldid" ]]; then
       docker inspect $oldid &> /dev/null && docker kill $oldid > /dev/null
     fi
-
     ;;
 
   cleanup)
