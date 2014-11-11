@@ -46,6 +46,6 @@ fi
 
 echo "-----> Injecting Shoreman ..."
 
-id=$(echo "$runner" | docker run -i -a stdin $IMAGE /bin/bash -c "cat > /shoreman")
+id=$(echo "$runner" | docker run -i -a stdin $IMAGE /bin/bash -c "cat > /shoreman && chmod +x /shoreman")
 test $(docker wait $id) -eq 0
 docker commit $id $IMAGE > /dev/null
