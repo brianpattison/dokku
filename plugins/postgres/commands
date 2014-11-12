@@ -71,7 +71,11 @@ case "$1" in
 		if [ -z "$POSTGRES_VERSION" ]; then
 			POSTGRES_VERSION="latest"
 		fi
+
+		echo "Find Image dokkuinstaller/postgres:$POSTGRES_VERSION"
 		IMAGE=$(docker images | grep "dokkuinstaller/postgres" | grep "$POSTGRES_VERSION" |  awk '{print $3}')
+		echo "IMAGE: $IMAGE"
+
 		if [[ -z $IMAGE ]]; then
         	echo "PostgreSQL image not found... Did you run 'dokku plugins-install' ?"
 			exit 1
@@ -92,6 +96,7 @@ case "$1" in
 		fi
 
 		# Fork DB image
+		echo "FORK IMAGE: dokkuinstaller/postgres:$POSTGRES_VERSION"
 		ID=$(docker run -d "dokkuinstaller/postgres:$POSTGRES_VERSION" echo '')
 		docker wait $ID > /dev/null
 		IMAGE=$(docker commit $ID)
