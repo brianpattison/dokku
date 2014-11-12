@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+APP=$1
+PORT=$2
+CONTAINERID=$3
+
+echo "WHAT UP?"
+
+# Source in app env to get DOKKU_CHECKS_WAIT and any other necessary vars
+[[ -f "$DOKKU_ROOT/$APP/ENV" ]] && source $DOKKU_ROOT/$APP/ENV
+
+echo "WHAT UP 2?"
+
+# Wait this many seconds (default 5) for server to start before running checks.
+WAIT="${DOKKU_CHECKS_WAIT:-5}"
+# Wait this many seconds (default 30) for each response.
+TIMEOUT="${DOKKU_CHECKS_TIMEOUT:-30}"
+echo "-----> Waiting $WAIT seconds ..."
+sleep $WAIT
+
+# -q           do not use .curlrc (must come first)
+# --compressed Test compression handled correctly
+# --fail       Fail on server errors (4xx, 5xx)
+# --location   Follow redirects
+CURL_OPTIONS="-q --compressed --fail --location --max-time $TIMEOUT"
+PROTOCOL="http"
+HOSTNAME="localhost"
+PATHNAME="/"
+URL="$PROTOCOL://localhost/"
+CURL_ARGS="$CURL_OPTIONS $PROTOCOL://localhost:$PORT/"
+
+echo "WHAT UP 3? $CURL_ARGS"
+
+if OUTPUT=$(curl -I $CURL_ARGS 2>&1) ; then
+	# OUTPUT contains the HTTP response
+	if [[ "$OUTPUT" =~ "HTTP/1.1 200 OK" ]] ; then
+		echo "HTTP/1.1 200 OK"
+	else
+		echo "Expected HTTP/1.1 200 OK"
+		echo "Actual Response:"
+		echo $OUTPUT &&
+		exit 1
+	fi
+else
+	# Failed to connect/no response, OUTPUT contains error message
+	echo -e "		\033[31m\033[1m$OUTPUT\033[0m" &&
+	exit 2
+fi
+
+echo -e "-----> \033[32m\033[1mAll checks successful!\033[0m"
