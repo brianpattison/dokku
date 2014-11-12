@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
-CONTAINERID="$1"; APP="$2"; PORT="$3" ; HOSTNAME="${4:-localhost}"
+APP="$2"; PORT="$3"
 
 # source in app env to get DOKKU_CHECKS_WAIT and any other necessary vars
 [[ -f "$DOKKU_ROOT/$APP/ENV" ]] && source $DOKKU_ROOT/$APP/ENV
@@ -17,7 +17,7 @@ sleep $WAIT
 # --fail       Fail on server errors (4xx, 5xx)
 # --location   Follow redirects
 CURL_OPTIONS="-q --compressed --fail --location --max-time 30"
-URL="http://$HOSTNAME:$PORT/"
+URL="http://localhost:$PORT/"
 
 attempts=0
 
@@ -39,6 +39,8 @@ do
 	fi
 	attempts=$[$attempts+1]
 	echo "FAILED ATTEMPT #$attempts"
+	echo "Waiting $WAIT seconds ..."
+	sleep $WAIT
 done
 
 echo -e "\033[32m\033[1mAll checks successful!\033[0m"
