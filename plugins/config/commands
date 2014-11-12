@@ -108,7 +108,7 @@ case "$1" in
 		APP="$2"; APP_DIR="$DOKKU_ROOT/$APP"
 		ENV_ADD=""
 		ENV_TEMP=`cat "${ENV_FILE}"`
-		RESTART_APP=false
+		RESTART=false
 		shift 2
 
 		for var; do
