@@ -220,7 +220,7 @@ case "$1" in
     help)
     cat && cat<<EOF
     postgres:console <db>				Open a PostgreSQL console
-    postgres:create <db>				Create a PostgreSQL container
+    postgres:create <db> [VERSION]			Create a PostgreSQL container
     postgres:delete <db>				Delete specified PostgreSQL container
     postgres:dump <db> > dump_file.sql			Dump database data
     postgres:info <db>					Display database informations
