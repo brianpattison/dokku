@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# Build docker image
-docker pull dokkuinstaller/postgres
+# Pull Postgres Images
+docker pull dokkuinstaller/postgres:9.3
+docker pull dokkuinstaller/postgres:9.4
+docker pull dokkuinstaller/postgres:latest
 
 # Install postgres-client
 apt-get install -y postgresql-client
