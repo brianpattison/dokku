@@ -68,17 +68,15 @@ case "$1" in
 	postgres:create)
 		DB_IMAGE=postgres/$APP
 		# Check if DB container is installed
-		POSTGRES_VERSION="$3"
 		if [ -z "$POSTGRES_VERSION" ]; then
 			POSTGRES_VERSION="latest"
 		fi
-		echo "POSTGRES: $POSTGRES_VERSION"
 		IMAGE=$(docker images | grep "dokkuinstaller/postgres" | grep "$POSTGRES_VERSION" |  awk '{print $3}')
-		echo "IMAGE: $IMAGE"
 		if [[ -z $IMAGE ]]; then
         	echo "PostgreSQL image not found... Did you run 'dokku plugins-install' ?"
 			exit 1
 		fi
+
 		# Check if an existing DB volume exists
 		if [[ -f "$DOKKU_ROOT/.postgres/volume_$APP" ]]; then
 			VOLUME="`cat $DOKKU_ROOT/.postgres/volume_$APP`:/opt/postgres"
@@ -92,14 +90,17 @@ case "$1" in
 			chown dokku: "$DOKKU_ROOT/.postgres/pwd_$APP"
 			chmod 700 "$DOKKU_ROOT/.postgres/pwd_$APP"
 		fi
+
 		# Fork DB image
-		ID=$(docker run -d dokkuinstaller/postgres echo '')
+		ID=$(docker run -d "dokkuinstaller/postgres:$POSTGRES_VERSION" echo '')
 		docker wait $ID > /dev/null
 		IMAGE=$(docker commit $ID)
 		docker tag $IMAGE $DB_IMAGE
+
 		# Launch container
 		ID=$(docker run -v $VOLUME -p 5432 -d $DB_IMAGE /usr/bin/start_pgsql.sh $DB_PASSWORD)
 		sleep 4
+
 		# Rename persistent volume
 		if [[ ! -f "$DOKKU_ROOT/.postgres/volume_$APP" ]]; then
 			VOLUME_PATH=$(docker inspect $ID | grep /var/lib/docker/vfs/dir/ | awk '{print $2}' | sed -e's/"//g')
