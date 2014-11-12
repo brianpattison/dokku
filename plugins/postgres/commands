@@ -67,7 +67,9 @@ case "$1" in
 
 	postgres:create)
 		DB_IMAGE=postgres/$APP
+
 		# Check if DB container is installed
+		POSTGRES_VERSION="$3"
 		if [ -z "$POSTGRES_VERSION" ]; then
 			POSTGRES_VERSION="latest"
 		fi
