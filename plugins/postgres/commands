@@ -72,6 +72,7 @@ case "$1" in
 		if [ -z "$POSTGRES_VERSION" ]; then
 			POSTGRES_VERSION="latest"
 		fi
+		echo "POSTGRES: $POSTGRES_VERSION"
 		IMAGE=$(docker images | grep "dokkuinstaller/postgres" | grep "$POSTGRES_VERSION" |  awk '{print $3}')
 		if [[ -z $IMAGE ]]; then
         	echo "PostgreSQL image not found... Did you run 'dokku plugins-install' ?"
