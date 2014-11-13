@@ -21,13 +21,14 @@ CURL_OPTIONS="-q --compressed --fail --location --max-time 30"
 URL="http://localhost:$PORT/"
 
 attempts=0
+success=false
 
 until [ $attempts -ge $MAX_ATTEMPTS ]
 do
 	echo "checking with: curl $CURL_OPTIONS $URL"
 	if OUTPUT=$(curl -I $CURL_OPTIONS $URL 2>&1) ; then
 		if [[ "$OUTPUT" =~ "HTTP/1.1 200 OK" ]] ; then
-			SUCCESS=true
+			success=true
 			echo "HTTP/1.1 200 OK" && break
 		fi
 	fi
@@ -39,7 +40,7 @@ do
 	sleep $WAIT
 done
 
-if [[ -z $SUCCESS ]] ; then
+if $success ; then
 	echo -e "\033[32m\033[1mAll checks successful!\033[0m"
 else
 	echo "FAILED TO LOAD APP"
