@@ -100,7 +100,7 @@ case "$1" in
 		docker tag $IMAGE $DB_IMAGE
 
 		# Launch container
-		ID=$(docker run --restart=always -v $VOLUME -p 5432 -d $DB_IMAGE /usr/bin/start_pgsql.sh $DB_PASSWORD)
+		ID=$(docker run -v $VOLUME -p 5432 -d $DB_IMAGE /usr/bin/start_pgsql.sh $DB_PASSWORD)
 		sleep 4
 
 		# Rename persistent volume
