@@ -25,6 +25,7 @@ if [[ -n $PG_APP_IMAGE_ID ]]; then
         echo "ok."
     else
         echo "stopped."
+	DB_PASSWORD=$(cat "$DOKKU_ROOT/.postgres/pwd_$APP")
         PG_VOLUME="`cat $DOKKU_ROOT/.postgres/volume_$APP`:/opt/postgres"
 
         echo -n "       Launching $PG_APP_IMAGE... "

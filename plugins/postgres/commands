@@ -49,7 +49,6 @@ function get_postgres_port() {
     echo $PORT
 }
 
-
 function connect_to_db() {
     export PGPASSWORD=$(cat "$DOKKU_ROOT/.postgres/pwd_$APP")
     PORT=$(get_postgres_port)
