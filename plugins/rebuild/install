@@ -1,4 +1,0 @@
-#!/bin/bash
-
-echo "dokku rebuild:all" > /etc/rc6.d/dokku_rebuild_all
-chmod +x /etc/rc6.d/dokku_rebuild_all

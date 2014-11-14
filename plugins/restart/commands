@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
+
+case "$1" in
+  restart)
+    if [[ -z $2 ]]; then
+      echo "Please specify an app to restart"
+      exit 1
+    fi
+    APP="$2"
+    IMAGE="dokku/$APP"
+
+    echo "-----> Releasing $APP ..."
+    dokku release $APP $IMAGE
+    echo "-----> Release complete!"
+    echo "-----> Deploying $APP ..."
+    dokku deploy $APP $IMAGE
+    echo "-----> Deploy complete!"
+    ;;
+
+  restart:all)
+    for app in $(ls -d $DOKKU_ROOT/*/); do
+      APP=$(basename $app);
+      dokku restart $APP
+    done
+    ;;
+
+  help)
+    cat && cat<<EOF
+    restart <app>					Restart an app
+    restart:all						Restart all apps
+EOF
+  ;;
+
+esac
