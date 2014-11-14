@@ -47,7 +47,7 @@ case "$1" in
 		IMAGE=$(docker commit $ID)
 		docker tag $IMAGE $REDIS_IMAGE
 		# Launch container
-		ID=$(docker run --restart=always -v $VOLUME -p 6379 -d $REDIS_IMAGE /bin/start_redis.sh)
+		ID=$(docker run -v $VOLUME -p 6379 -d $REDIS_IMAGE /bin/start_redis.sh)
 		sleep 4
 		echo
 		echo "-----> Redis container created: $REDIS_IMAGE"
