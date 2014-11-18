@@ -25,18 +25,18 @@ if [[ -n $PG_APP_IMAGE_ID ]]; then
         echo "ok."
     else
         echo "stopped."
-	DB_PASSWORD=$(cat "$DOKKU_ROOT/.postgres/pwd_$APP")
-        PG_VOLUME="`cat $DOKKU_ROOT/.postgres/volume_$APP`:/opt/postgres"
+		DB_PASSWORD=$(cat "$DOKKU_ROOT/.postgres/pwd_$APP")
+        PG_VOLUME="$DOKKU_ROOT/.postgres/volume_$APP:/opt/postgres"
 
         echo -n "       Launching $PG_APP_IMAGE... "
         echo "COMMAND: docker run -v $PG_VOLUME -p 5432 -d $PG_APP_IMAGE /usr/bin/start_pgsql.sh $DB_PASSWORD"
 
-	ID=$(docker run -v $PG_VOLUME -p 5432 -d $PG_APP_IMAGE /usr/bin/start_pgsql.sh $DB_PASSWORD)
+		ID=$(docker run -v $PG_VOLUME -p 5432 -d $PG_APP_IMAGE /usr/bin/start_pgsql.sh $DB_PASSWORD)
         sleep 1
 
-	PORT=$(docker port "$ID" 5432 | sed 's/0.0.0.0://')
-	dokku config:set $APP "DATABASE_URL=postgres://root:$DB_PASSWORD@172.17.42.1:$PORT/db"
+		PORT=$(docker port "$ID" 5432 | sed 's/0.0.0.0://')
+		dokku config:set $APP "DATABASE_URL=postgres://root:$DB_PASSWORD@172.17.42.1:$PORT/db"
 
-	echo "ok."
+		echo "ok."
     fi
 fi

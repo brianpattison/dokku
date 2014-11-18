@@ -79,18 +79,18 @@ case "$1" in
 		fi
 
 		# Check if an existing DB volume exists
-		if [[ -f "$DOKKU_ROOT/.postgres/volume_$APP" ]]; then
-			VOLUME="`cat $DOKKU_ROOT/.postgres/volume_$APP`:/opt/postgres"
-			echo
-			echo "-----> Reusing postgres/$APP database"
-		else
-			VOLUME="/opt/postgres"
+		if ! [[ -d "$DOKKU_ROOT/.postgres/volume_$APP" ]]; then
+			# Create the DB directory
+			mkdir -p "$DOKKU_ROOT/.postgres/volume_$APP"
+			chown dokku: "$DOKKU_ROOT/.postgres/volume_$APP"
+
 			# Generate a random password for DB user
 			DB_PASSWORD=$(< /dev/urandom tr -dc A-Za-z0-9 | head -c 16)
 			echo $DB_PASSWORD > "$DOKKU_ROOT/.postgres/pwd_$APP"
 			chown dokku: "$DOKKU_ROOT/.postgres/pwd_$APP"
 			chmod 700 "$DOKKU_ROOT/.postgres/pwd_$APP"
 		fi
+		VOLUME="$DOKKU_ROOT/.postgres/volume_$APP:/opt/postgres"
 
 		# Fork DB image
 		ID=$(docker run -d "dokkuinstaller/postgres:$POSTGRES_VERSION" echo '')
@@ -102,15 +102,6 @@ case "$1" in
 		ID=$(docker run -v $VOLUME -p 5432 -d $DB_IMAGE /usr/bin/start_pgsql.sh $DB_PASSWORD)
 		sleep 4
 
-		# Rename persistent volume
-		if [[ ! -f "$DOKKU_ROOT/.postgres/volume_$APP" ]]; then
-			VOLUME_PATH=$(docker inspect $ID | grep /var/lib/docker/vfs/dir/ | awk '{print $2}' | sed -e's/"//g')
-			if [[ -z $VOLUME_PATH ]]; then
-				echo "Your docker version is too old, please update it"
-				exit 1
-			fi
-			echo $VOLUME_PATH > "$DOKKU_ROOT/.postgres/volume_$APP"
-		fi
 		echo
 		echo "-----> PostgreSQL container created: $DB_IMAGE"
 		sleep 1
