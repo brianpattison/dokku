@@ -83,6 +83,7 @@ case "$1" in
 			# Create the DB directory
 			mkdir -p "$DOKKU_ROOT/.postgres/volume_$APP"
 			chown dokku: "$DOKKU_ROOT/.postgres/volume_$APP"
+			chmod 700 "$DOKKU_ROOT/.postgres/volume_$APP"
 
 			# Generate a random password for DB user
 			DB_PASSWORD=$(< /dev/urandom tr -dc A-Za-z0-9 | head -c 16)
