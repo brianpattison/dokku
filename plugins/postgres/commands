@@ -91,7 +91,7 @@ case "$1" in
 			chown dokku: "$DOKKU_ROOT/.postgres/pwd_$APP"
 			chmod 700 "$DOKKU_ROOT/.postgres/pwd_$APP"
 		fi
-		VOLUME="$DOKKU_ROOT/.postgres/volume_$APP:/opt/postgres"
+		VOLUME="$DOKKU_ROOT/.postgres/volume_$APP:/opt/postgresql"
 
 		# Fork DB image
 		ID=$(docker run -d "dokkuinstaller/postgres:$POSTGRES_VERSION" echo '')
