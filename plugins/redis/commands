@@ -90,7 +90,7 @@ case "$1" in
 	redis:info)
 		REDIS_IMAGE=redis/$APP
 		ID=$(docker ps -a | grep "$REDIS_IMAGE":latest |  awk '{print $1}')
-		IP=$(docker inspect $ID | grep IPAddress | awk '{ print $2 }' | tr -d ',"')
+		IP="172.17.42.1"
 		PORT=$(docker port $ID 6379 | cut -d":" -f2)
 		echo
 		echo "       Host: $IP"
@@ -108,11 +108,9 @@ case "$1" in
 			REDIS_IMAGE="redis/$3"
 			ID=$(docker ps -a | grep "$REDIS_IMAGE":latest |  awk '{print $1}')
 			if [[ -n "$ID" ]]; then
-				IP=$(docker inspect $ID | grep IPAddress | awk '{ print $2 }' | tr -d ',"')
 				PORT=$(get_redis_port)
-				# Write REDIS_IP to app's ENV file
 
-				REDIS_URL="REDIS_URL=redis://$IP:$PORT"
+				REDIS_URL="REDIS_URL=redis://172.17.42.1:$PORT"
 				ENV_FILE="$DOKKU_ROOT/$APP/ENV"
 				if [[ ! -f $ENV_FILE ]]; then
 					touch $ENV_FILE
