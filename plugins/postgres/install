@@ -1,9 +1,7 @@
 #!/bin/bash
 
-# Pull Postgres Images
-docker pull dokkuinstaller/postgres:9.3
-docker pull dokkuinstaller/postgres:9.4
-docker pull dokkuinstaller/postgres:latest
-
-# Install postgres-client
-apt-get install -y postgresql-client
+# Build docker image
+TEMPDIR=$(mktemp -d)
+git clone https://github.com/orchardup/docker-postgresql $TEMPDIR
+docker build -q=true -t jezdez/postgres $TEMPDIR
+rm -rf $TEMPDIR
