@@ -1,16 +1,10 @@
 #!/usr/bin/env bash
 APP="$1";
 
-echo "post-deploy"
-echo "APP: $APP"
-
 # source in app env to get RAKE_DB_MIGRATE variable
 [[ -f "$DOKKU_ROOT/$APP/ENV" ]] && source $DOKKU_ROOT/$APP/ENV
 
-echo "source success"
-echo "RAKE_DB_MIGRATE: $RAKE_DB_MIGRATE"
-
 if [[ $RAKE_DB_MIGRATE == "true" ]]; then
-	echo "Running: rake db:migrate"
+	echo "-----> Running: rake db:migrate"
 	dokku run $APP rake db:migrate
 fi
