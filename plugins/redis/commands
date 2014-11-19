@@ -81,7 +81,7 @@ case "$1" in
 			docker rmi $IMAGE
 		fi
 		# Remove persistent volume
-		HOST_DIR="$DOKKU_ROOT/.redis/volume-$APP"
+		HOST_DIR="$DOKKU_ROOT/.redis/volume_$APP"
 		if [[ -d $HOST_DIR ]]; then
 			rm -rf $HOST_DIR
 		fi
