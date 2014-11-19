@@ -5,6 +5,7 @@ APP="$1";
 # source in app env to get RAKE_DB_MIGRATE variable
 [[ -f "$DOKKU_ROOT/$APP/ENV" ]] && source $DOKKU_ROOT/$APP/ENV
 
-if ! [[ $RAKE_DB_MIGRATE == "true" ]] then;
+if ! [[ $RAKE_DB_MIGRATE == "true" ]]; then
+	echo "Running rake db:migrate..."
 	dokku run $APP rake db:migrate
 fi
