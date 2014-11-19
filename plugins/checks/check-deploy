@@ -10,7 +10,7 @@ fi
 
 # source in app env to get DOKKU_CHECKS_WAIT and any other necessary vars
 [[ -f "$DOKKU_ROOT/$APP/ENV" ]] && source $DOKKU_ROOT/$APP/ENV
-echo "DOKKU_CHECKS_WAIT is $DOKKU_CHECKS_WAIT"
+# echo "DOKKU_CHECKS_WAIT is $DOKKU_CHECKS_WAIT"
 FILENAME="$DOKKU_ROOT/$APP/CHECKS"
 WAIT="${DOKKU_CHECKS_WAIT:-5}"
 MAX_ATTEMPTS=5
