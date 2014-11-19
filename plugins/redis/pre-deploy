@@ -1,0 +1,32 @@
+#!/bin/bash
+set -e;
+
+echo "-----> Checking status of Redis"
+
+APP="$1"
+
+REDIS_APP_IMAGE="redis/$APP"
+REDIS_VOLUME_PATH="$DOKKU_ROOT/.redis/volume_$APP"
+
+# Check if an existing DB volume exists
+REDIS_APP_IMAGE_ID=$(docker images | grep "$REDIS_APP_IMAGE" |  awk '{print $3}')
+if [[ -n $REDIS_APP_IMAGE_ID ]] && [[ -f $REDIS_VOLUME_PATH ]]; then
+
+    echo    "       Found image redis/$APP database"
+    echo -n "       Checking status... "
+
+    REDIS_APP_CONTAINER_ID=$(docker ps | grep "$REDIS_APP_IMAGE" |  awk '{print $1}')
+    if [[ -n $REDIS_APP_CONTAINER_ID ]]; then
+        echo "ok."
+    else
+        echo "stopped."
+
+	REDIS_VOLUME="`cat $REDIS_VOLUME_PATH`:/var/lib/redis"
+
+        echo -n "       Launching $REDIS_APP_IMAGE... "
+        echo "COMMAND: docker run -v $REDIS_VOLUME -p 6379 -d $REDIS_IMAGE /bin/start_redis.sh"
+        ID=$(docker run -v $REDIS_VOLUME -p 6379 -d $REDIS_IMAGE /bin/start_redis.sh)
+        sleep 1
+        echo "ok."
+    fi
+fi
