@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -x
 APP="$1";
 
 echo "post-deploy"
@@ -11,7 +10,7 @@ echo "APP: $APP"
 echo "source success"
 echo "RAKE_DB_MIGRATE: $RAKE_DB_MIGRATE"
 
-if ! [[ $RAKE_DB_MIGRATE == "true" ]]; then
+if [[ $RAKE_DB_MIGRATE == "true" ]]; then
 	echo "Running: rake db:migrate"
 	dokku run $APP rake db:migrate
 fi
