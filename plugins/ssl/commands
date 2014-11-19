@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
+
+if [[ $1 == ssl:* ]]; then
+	if [[ -z $2 ]]; then
+		echo "You must specify an app name"
+		exit 1
+	else
+		APP="$2"
+
+		# Check if app exists with the same name
+		if [ ! -d "$DOKKU_ROOT/$APP" ]; then
+			echo "App $APP does not exist"
+			exit 1
+		fi
+	fi
+fi
+
+APP_DIR="$DOKKU_ROOT/$APP"
+
+case "$1" in
+  ssl:certificate)
+    mkdir -p "$APP_DIR/tls"
+    CERTIFICATE=$(cat)
+
+    echo "$CERTIFICATE" | openssl x509 -text -noout
+    echo "$CERTIFICATE" > "$APP_DIR/tls/server.crt"
+
+    [[ ! -f "$APP_DIR/tls/server.key" ]] || dokku deploy "$APP"
+    ;;
+
+  ssl:key)
+    mkdir -p "$APP_DIR/tls"
+    KEY=$(cat)
+
+    echo "$KEY" | openssl rsa -check
+    echo "$KEY" > "$APP_DIR/tls/server.key"
+
+    [[ ! -f "$APP_DIR/tls/server.crt" ]] || dokku deploy "$APP"
+    ;;
+
+  ssl:info)
+    if [[ -f "$APP_DIR/tls/server.crt" ]]; then
+        openssl x509 -in "$APP_DIR/tls/server.crt" -text -noout || true
+    fi
+    ;;
+
+  ssl:delete)
+    rm -f "$APP_DIR/tls/server.crt" "$APP_DIR/tls/server.key"
+    dokku deploy "$APP"
+    ;;
+
+  help)
+    cat && cat<<EOF
+    ssl:certificate <app>				Pipe signed certifcate with all intermediates for an app
+    ssl:key <app>					Pipe private key for an app
+    ssl:info <app>					Show info about certifcate and certificate request
+    ssl:delete <app>					Wipes certificate for an app
+EOF
+    ;;
+esac
