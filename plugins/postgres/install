@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# Build docker image
-git clone https://github.com/Kloadut/dokku-pg-dockerfiles /tmp/dokku-pg-dockerfiles
-docker build -q=true -t kloadut/postgresql /tmp/dokku-pg-dockerfiles
-rm -rf /tmp/dokku-pg-dockerfiles
+# Pull Postgres Images
+docker pull dokkuinstaller/postgres:9.3
+docker pull dokkuinstaller/postgres:9.4
+docker pull dokkuinstaller/postgres:latest
+
+# Install postgres-client
+apt-get install -y postgresql-client
