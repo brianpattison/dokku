@@ -1,5 +1,6 @@
 #!/bin/bash
 
 # Build docker image
-CWD=$(cd $(dirname $0); pwd)
-docker build -t jezdez/redis $CWD
+git clone https://github.com/luxifer/dokku-redis-dockerfiles.git /tmp/dokku-redis-dockerfiles
+docker build -q=true -t luxifer/redis /tmp/dokku-redis-dockerfiles
+rm -rf /tmp/dokku-redis-dockerfiles
