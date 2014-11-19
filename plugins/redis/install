@@ -1,4 +1,6 @@
 #!/bin/bash
 
 # Build docker image
-docker pull dokkuinstaller/redis
+docker pull dokkuinstaller/redis:2.8.17
+docker pull dokkuinstaller/redis:3.0.0
+docker pull dokkuinstaller/redis:latest
