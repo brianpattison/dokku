@@ -49,10 +49,10 @@ case "$1" in
 	fi
 
 	# Fork DB image
-	ID=$(docker run -d "dokkuinstaller/redis:$DB_VERSION" echo '')
+	ID=$(docker run -d "dokkuinstaller/redis:$REDIS_VERSION" echo '')
 	docker wait $ID > /dev/null
 	IMAGE=$(docker commit $ID)
-	docker tag $IMAGE $DB_IMAGE
+	docker tag $IMAGE $REDIS_IMAGE
 
 	# Launch container
 	ID=$(docker run -v $VOLUME -p 6379 -d $REDIS_IMAGE /bin/start_redis.sh)
@@ -71,7 +71,7 @@ case "$1" in
 	# Link to a potential existing app
 	dokku redis:link $APP $APP
 	echo
-	echo "-----> Redis container created: $DB_IMAGE"
+	echo "-----> Redis container created: $REDIS_IMAGE"
 	sleep 1
 	dokku redis:info $APP
 	;;
