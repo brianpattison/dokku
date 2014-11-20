@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+APP="$1";
+
+if [[ -f "/etc/rc6.d/dokku_restart_$APP" ]]; then
+	rm "/etc/rc6.d/dokku_restart_$APP"
+fi
