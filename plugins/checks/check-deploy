@@ -3,9 +3,11 @@
 set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
 APP="$2"; PORT="$3"
 
-if ! [[ -f "$DOKKU_ROOT/$APP/CONTAINER" ]]; then
-  # Allow the app to be deployed the first time
-  exit 0
+# Check to see if the container is running
+ID=$(docker ps | grep "dokku/$APP" |  awk '{print $1}')
+if ! [[ -n $ID ]]; then
+	# Allow the app to be deployed if not running
+	exit 0
 fi
 
 # source in app env to get DOKKU_CHECKS_WAIT and any other necessary vars
