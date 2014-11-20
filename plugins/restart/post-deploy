@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 APP="$1";
 
-echo "dokku restart $APP" > "/etc/rc6.d/dokku_restart_$APP"
-chmod +x "/etc/rc6.d/dokku_restart_$APP"
+sudo echo "dokku restart $APP" > "/etc/rc6.d/dokku_restart_$APP"
+sudo chmod +x "/etc/rc6.d/dokku_restart_$APP"
