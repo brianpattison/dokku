@@ -1,4 +1,0 @@
-#!/bin/bash
-
-# echo "dokku restart:all" > /etc/rc6.d/dokku_restart_all
-# chmod +x /etc/rc6.d/dokku_restart_all
