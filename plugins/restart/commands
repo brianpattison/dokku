@@ -21,7 +21,10 @@ case "$1" in
   restart:all)
     for app in $(ls -d $DOKKU_ROOT/*/); do
       APP=$(basename $app);
-      dokku restart $APP
+
+	  if [[ -f $DOKKU_ROOT/$APP/CONTAINER ]]; then
+		  dokku restart $APP
+	  fi
     done
     ;;
 
