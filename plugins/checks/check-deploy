@@ -7,7 +7,6 @@ APP="$2"; PORT="$3"
 [[ -f "$DOKKU_ROOT/$APP/ENV" ]] && source $DOKKU_ROOT/$APP/ENV
 FILENAME="$DOKKU_ROOT/$APP/CHECKS"
 WAIT="${DOKKU_WAIT:-5}"
-MAX_ATTEMPTS=5
 
 # Check to see if the container is running
 if [[ -f $DOKKU_ROOT/$APP/CONTAINER ]]; then
@@ -16,18 +15,20 @@ if [[ -f $DOKKU_ROOT/$APP/CONTAINER ]]; then
 
 	# Allow the app to be deployed if not running
 	if ! [[ $status =~ '"Running": true' ]]; then
-		echo "App not running. Deploying immediately..."
+		echo "       App not running. Deploying immediately..."
+		sleep $WAIT
 		exit 0
 	else
-		echo "App is running. Checking that new container is ready..."
+		echo "       App is running. Checking that new container is ready..."
 	fi
 else
 	# Allow the app to be deployed for the first time
-	echo "App not running. Deploying immediately..."
+	echo "       App not running. Deploying immediately..."
+	sleep $WAIT
 	exit 0
 fi
 
-echo "Waiting $WAIT seconds ..."
+echo "       Waiting $WAIT seconds ..."
 sleep $WAIT
 
 # -q           do not use .curlrc (must come first)
@@ -38,28 +39,29 @@ CURL_OPTIONS="-q --compressed --fail --location --max-time 30"
 URL="http://localhost:$PORT/"
 
 attempts=0
+max_attempts=5
 success=false
 
-until [ $attempts -ge $MAX_ATTEMPTS ]
+until [ $attempts -ge $max_attempts ]
 do
-	echo "checking with: curl $CURL_OPTIONS $URL"
-	if OUTPUT=$(curl -I $CURL_OPTIONS $URL 2>&1) ; then
-		if [[ "$OUTPUT" =~ "HTTP/1.1 200 OK" ]] ; then
+	attempt_number=$[$attempts+1]
+	echo "-----> Checking $URL. Attempt $attempt_number of $max_attempts"
+	if output=$(curl -I $CURL_OPTIONS $URL 2>&1) ; then
+		if [[ "$output" =~ "HTTP/1.1 200 OK" ]] ; then
 			success=true
 			echo "HTTP/1.1 200 OK" && break
 		fi
 	fi
 	attempts=$[$attempts+1]
-	echo "FAILED ATTEMPT #$attempts"
-	echo "Response:"
-	echo $OUTPUT
-	echo "Waiting $WAIT seconds ..."
+	echo "-----> Bad Response"
+	echo "       $output"
+	echo "       Trying again in $WAIT seconds ..."
 	sleep $WAIT
 done
 
 if $success ; then
 	echo -e "\033[32m\033[1mAll checks successful!\033[0m"
 else
-	echo "FAILED TO LOAD APP"
+	echo "Failed to load after $max_attempts attempts."
 	exit 2
 fi
