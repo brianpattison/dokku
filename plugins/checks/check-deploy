@@ -54,7 +54,9 @@ do
 	fi
 	attempts=$[$attempts+1]
 	echo "       Expected HTTP/1.1 200 OK. Bad Response:"
+	echo
 	echo "       $output"
+	echo
 	echo "       Trying again in $WAIT seconds ..."
 	sleep $WAIT
 done
