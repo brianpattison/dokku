@@ -15,7 +15,7 @@ if [[ -f $DOKKU_ROOT/$APP/CONTAINER ]]; then
 
 	# Allow the app to be deployed if not running
 	if ! [[ $status =~ '"Running": true' ]]; then
-		echo "       App not running. Deploying immediately..."
+		echo "       App not running. Skipping checks..."
 		sleep $WAIT
 		exit 0
 	else
@@ -23,7 +23,7 @@ if [[ -f $DOKKU_ROOT/$APP/CONTAINER ]]; then
 	fi
 else
 	# Allow the app to be deployed for the first time
-	echo "       App not running. Deploying immediately..."
+	echo "       App not running. Skipping checks..."
 	sleep $WAIT
 	exit 0
 fi
