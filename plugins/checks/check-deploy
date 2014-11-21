@@ -9,7 +9,7 @@ if [[ -f $DOKKU_ROOT/$APP/CONTAINER ]]; then
 	status=$(docker inspect $oldid)
 
 	# Allow the app to be deployed if not running
-	if [[ $result =~ '"Running": false' ]]; then
+	if [[ $status =~ '"Running": false' ]]; then
 		exit 0
 	fi
 else
