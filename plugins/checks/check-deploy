@@ -49,18 +49,18 @@ do
 	if output=$(curl -I $CURL_OPTIONS $URL 2>&1) ; then
 		if [[ "$output" =~ "HTTP/1.1 200 OK" ]] ; then
 			success=true
-			echo "HTTP/1.1 200 OK" && break
+			echo "       HTTP/1.1 200 OK" && break
 		fi
 	fi
 	attempts=$[$attempts+1]
-	echo "-----> Bad Response"
+	echo "       Expected HTTP/1.1 200 OK. Bad Response:"
 	echo "       $output"
 	echo "       Trying again in $WAIT seconds ..."
 	sleep $WAIT
 done
 
 if $success ; then
-	echo -e "\033[32m\033[1mAll checks successful!\033[0m"
+	echo -e "       \033[32m\033[1mAll checks successful!\033[0m"
 else
 	echo "Failed to load after $max_attempts attempts."
 	exit 2
