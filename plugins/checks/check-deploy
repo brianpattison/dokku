@@ -6,11 +6,14 @@ APP="$2"; PORT="$3"
 # Check to see if the container is running
 if [[ -f $DOKKU_ROOT/$APP/CONTAINER ]]; then
 	oldid=$(< "$DOKKU_ROOT/$APP/CONTAINER")
-	status=$(docker inspect $oldid)
+	status=$(docker inspect $oldid || true)
 
 	# Allow the app to be deployed if not running
-	if [[ $status =~ '"Running": false' ]]; then
+	if ! [[ $status =~ '"Running": true' ]]; then
+		echo "App not running. Check is working!"
 		exit 0
+	else
+		echo "App is running. Check is working!"
 	fi
 else
 	# Allow the app to be deployed for the first time
