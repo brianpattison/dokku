@@ -45,7 +45,7 @@ success=false
 until [ $attempts -ge $max_attempts ]
 do
 	attempt_number=$[$attempts+1]
-	echo "-----> Checking $URL. Attempt $attempt_number of $max_attempts"
+	echo "-----> Checking $URL Attempt $attempt_number of $max_attempts"
 	if output=$(curl -I $CURL_OPTIONS $URL 2>&1) ; then
 		if [[ "$output" =~ "HTTP/1.1 200 OK" ]] ; then
 			success=true
