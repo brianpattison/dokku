@@ -5,6 +5,11 @@ APP="$1";
 [[ -f "$DOKKU_ROOT/$APP/ENV" ]] && source $DOKKU_ROOT/$APP/ENV
 
 if [[ $RAKE_DB_MIGRATE == "true" ]]; then
-	echo "-----> Running: rake db:migrate..."
-	dokku run $APP rake db:migrate
+	# Make sure everything is running before attempting to run rake db:migrate
+	container_id=$(docker ps | grep "dokku/$APP" |  awk '{print $1}')
+	if [[ -n $container_id ]]; then
+		echo "-----> Running: rake db:migrate..."
+		sleep 5
+		dokku run $APP rake db:migrate
+	fi
 fi
