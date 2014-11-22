@@ -46,11 +46,20 @@ until [ $attempts -ge $max_attempts ]
 do
 	attempt_number=$[$attempts+1]
 	echo "-----> Checking $URL Attempt $attempt_number of $max_attempts"
-	if output=$(curl -I $CURL_OPTIONS $URL 2>&1) ; then
-		if [[ "$output" =~ "HTTP/1.1 200 OK" ]] ; then
+	if output=$(curl -I $CURL_OPTIONS $URL 2>&1); then
+		if [[ "$output" =~ "HTTP/1.1 200 OK" ]]; then
 			success=true
 			echo "       HTTP/1.1 200 OK" && break
 		fi
+
+		if [[ "$output" =~ "500 Internal Server Error" ]]; then
+			new_container_id=$(docker ps | grep 0.0.0.0:$PORT | awk '{print $1}')
+			echo "The new container returned: 500 Internal Server Error. Log output:"
+			echo
+			docker logs $new_container_id
+			exit 2
+		fi
+
 	fi
 	attempts=$[$attempts+1]
 	echo "       Expected HTTP/1.1 200 OK. Bad Response:"
