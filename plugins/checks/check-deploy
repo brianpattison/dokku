@@ -57,6 +57,7 @@ do
 			echo "The new container returned: 500 Internal Server Error. Log output:"
 			echo
 			docker logs $new_container_id
+			docker stop $new_container_id
 			exit 2
 		fi
 
