@@ -33,9 +33,8 @@ sleep $WAIT
 
 # -q           do not use .curlrc (must come first)
 # --compressed Test compression handled correctly
-# --fail       Fail on server errors (4xx, 5xx)
 # --location   Follow redirects
-CURL_OPTIONS="-q --compressed --fail --location --max-time 30"
+CURL_OPTIONS="-q --compressed --location --max-time 30"
 URL="http://localhost:$PORT/"
 
 attempts=0
