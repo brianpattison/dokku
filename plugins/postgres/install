@@ -5,5 +5,10 @@ docker pull dokkuinstaller/postgres:9.3
 docker pull dokkuinstaller/postgres:9.4
 docker pull dokkuinstaller/postgres:latest
 
+# Make Postgres 9.4 available for apt-get
+echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main 9.4" > "/etc/apt/sources.list.d/pgdg.list"
+apt-key adv --keyserver pgp.mit.edu --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8
+apt-get update
+
 # Install postgres-client
-apt-get install -y postgresql-client
+apt-get install -y postgresql-client-9.4
