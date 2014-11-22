@@ -79,7 +79,7 @@ case "$1" in
   redis:delete)
     REDIS_IMAGE=redis/$APP
     # Stop the container
-    ID=$(docker ps -a | grep "$REDIS_IMAGE":latest |  awk '{print $1}')
+    ID=$(docker ps | grep "$REDIS_IMAGE":latest |  awk '{print $1}')
     if [[ ! -z $ID ]]; then
         docker stop $ID
     fi
@@ -99,7 +99,7 @@ case "$1" in
 
   redis:info)
     REDIS_IMAGE=redis/$APP
-    ID=$(docker ps -a | grep "$REDIS_IMAGE":latest |  awk '{print $1}')
+    ID=$(docker ps | grep "$REDIS_IMAGE":latest |  awk '{print $1}')
     PORT=$(docker port $ID 6379 | cut -d":" -f2)
     echo
     echo "       Host: 172.17.42.1"
@@ -115,7 +115,7 @@ case "$1" in
             exit 1
         fi
         REDIS_IMAGE="redis/$3"
-        ID=$(docker ps -a | grep "$REDIS_IMAGE":latest |  awk '{print $1}')
+        ID=$(docker ps | grep "$REDIS_IMAGE":latest |  awk '{print $1}')
         if [[ -n "$ID" ]]; then
             PORT=$(docker port "$ID" 6379 | sed 's/0.0.0.0://')
 			# Link database using dokku command
@@ -128,7 +128,7 @@ case "$1" in
 
   redis:logs)
     REDIS_IMAGE=redis/$APP
-    ID=$(docker ps -a | grep "$REDIS_IMAGE" |  awk '{print $1}')
+    ID=$(docker ps | grep "$REDIS_IMAGE" |  awk '{print $1}')
     docker logs $ID | tail -n 100
     ;;
 
