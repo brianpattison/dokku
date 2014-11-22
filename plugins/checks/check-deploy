@@ -53,11 +53,11 @@ do
 
 		if [[ "$output" =~ "500 Internal Server Error" ]]; then
 			new_container_id=$(docker ps | grep 0.0.0.0:$PORT | awk '{print $1}')
-			echo "The new container returned: 500 Internal Server Error. Log output:"
+			echo "The new container returned: 500 Internal Server Error. Logs:"
 			echo
 			docker logs $new_container_id
-			docker stop $new_container_id
-			exit 2
+			echo
+			echo "------------------------------------------------------------"
 		fi
 
 	fi
