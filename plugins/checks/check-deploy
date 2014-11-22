@@ -51,15 +51,6 @@ do
 			echo "       HTTP/1.1 200 OK" && break
 		fi
 
-		if [[ "$output" =~ "500 Internal Server Error" ]]; then
-			new_container_id=$(docker ps | grep 0.0.0.0:$PORT | awk '{print $1}')
-			echo "The new container returned: 500 Internal Server Error. Logs:"
-			echo
-			docker logs $new_container_id
-			echo
-			echo "------------------------------------------------------------"
-		fi
-
 	fi
 	attempts=$[$attempts+1]
 	echo "       Expected HTTP/1.1 200 OK. Bad Response:"
@@ -74,5 +65,11 @@ if $success ; then
 	echo -e "       \033[32m\033[1mAll checks successful!\033[0m"
 else
 	echo "Failed to load after $max_attempts attempts."
+	new_container_id=$(docker ps | grep 0.0.0.0:$PORT | awk '{print $1}')
+	echo "------------------------------------------------------------"
+	echo
+	docker logs $new_container_id
+	echo
+	echo "------------------------------------------------------------"
 	exit 2
 fi
