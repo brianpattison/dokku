@@ -73,15 +73,20 @@ case "$1" in
 	timestamp=$(date +"%Y-%m-%d-%H.%M.%S")
 	backup_file="$DOKKU_ROOT/.postgresql/backups_$APP/$timestamp.sql"
 	dokku postgres:dump $APP > $backup_file
+	echo "TODO: Delete old backups"
 	;;
 
   postgres:backups:disable)
-  	# Disable automatic backups
+	crontab -l | while read -r; do
+		[[ $REPLY = *"00 03 * * * dokku postgres:backups:create $APP"* ]] && continue
+		printf '%s\n' "$REPLY"
+	done | crontab -
   	;;
 
   postgres:backups:enable)
 	mkdir -p "$DOKKU_ROOT/.postgresql/backups_$APP"
-
+	dokku postgres:backups:disable $APP
+	crontab -l | { cat; echo "00 03 * * * dokku postgres:backups:create $APP"; } | crontab -
 	;;
 
   postgres:console)
@@ -143,6 +148,7 @@ case "$1" in
     echo
     echo "-----> PostgreSQL container created: $DB_IMAGE"
     sleep 1
+    dokku postgres:backups:enable $APP
     dokku postgres:info $APP
     ;;
 
