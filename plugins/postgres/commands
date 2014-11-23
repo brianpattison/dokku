@@ -65,7 +65,7 @@ case "$1" in
 		for filepath in "$DOKKU_ROOT/.postgresql/backups_$APP/*.sql"; do
 			backup_found=true
 			filename=${filepath##*/}
-			echo $filename
+			printf "$filename\n"
 		done
 		if ! $backup_found; then
 			echo "There are no backups for $APP"
