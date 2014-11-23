@@ -62,11 +62,10 @@ case "$1" in
   postgres:backups)
 	if [[ -d "$DOKKU_ROOT/.postgresql/backups_$APP" ]]; then
 		backup_found=false
+		backups=""
 
-		for filepath in "$DOKKU_ROOT/.postgresql/backups_$APP/*.sql"; do
-			backup_found=true
-			filename=$(basename $filepath)
-			IFS=$'\n'; echo $filename
+		for backup_file in "$DOKKU_ROOT/.postgresql/backups_$APP/*.sql"; do
+			IFS=$'\n'; echo $backup_file
 		done
 		if ! $backup_found; then
 			echo "There are no backups for $APP"
