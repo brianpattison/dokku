@@ -92,12 +92,6 @@ case "$1" in
 	else
 		echo "Backup could not be found"
 	fi
-	if [[ -d "$DOKKU_ROOT/.postgresql/backups_$APP" ]]; then
-		files=$(ls "$DOKKU_ROOT/.postgresql/backups_$APP")
-		echo $files | tr " " "\n"
-	else
-		echo "There are no backups for $APP"
-	fi
 	;;
 
   postgres:backups:enable)
