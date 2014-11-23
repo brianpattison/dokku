@@ -74,7 +74,7 @@ case "$1" in
 	backup_file="$DOKKU_ROOT/.postgresql/backups_$APP/$timestamp.sql"
 	dokku postgres:dump $APP > $backup_file
 	# Keep the 20 newest backups and delete the rest
-	cd "$DOKKU_ROOT/.postgresql/backups_$APP" && ls -t | grep .sql | sed -e '1,19d' | xargs -d '\n' rm
+	cd "$DOKKU_ROOT/.postgresql/backups_$APP" && ls -t | grep .sql | sed -e '1,20d' | xargs -d '\n' rm
 	;;
 
   postgres:backups:disable)
