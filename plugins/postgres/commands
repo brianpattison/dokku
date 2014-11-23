@@ -84,6 +84,24 @@ case "$1" in
 	done | crontab -
   	;;
 
+  postgres:backups:download)
+    backup_name="$3"
+	backup_path="$DOKKU_ROOT/.postgresql/backups_$APP/$backup_name"
+	if [[ -f $backup_path ]]; then
+		cat $backup_path
+		# echo to stderr, as stdout will probably be redirected to a file
+		echo 1>&2
+	else
+		echo "Backup could not be found"
+	fi
+	if [[ -d "$DOKKU_ROOT/.postgresql/backups_$APP" ]]; then
+		files=$(ls "$DOKKU_ROOT/.postgresql/backups_$APP")
+		echo $files | tr " " "\n"
+	else
+		echo "There are no backups for $APP"
+	fi
+	;;
+
   postgres:backups:enable)
 	mkdir -p "$DOKKU_ROOT/.postgresql/backups_$APP"
 	dokku postgres:backups:disable $APP
