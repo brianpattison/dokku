@@ -85,19 +85,7 @@ case "$1" in
   	;;
 
   postgres:backups:download)
-    backup_name="$3"
-	echo "Backup name:"
-	echo $backup_name
-	echo "----"
-	echo $DOKKU_ROOT
-	echo "----"
-	if [[ -f "$DOKKU_ROOT/.postgresql/backups_$APP/$backup_name" ]]; then
-		echo "Exists"
-		cat "$DOKKU_ROOT/.postgresql/backups_$APP/$backup_name"
-	else
-		echo "Backup not be found"
-		echo $backup_name
-	fi
+	cd "$DOKKU_ROOT/.postgresql/backups_$APP" && cat "$3"
 	;;
 
   postgres:backups:enable)
