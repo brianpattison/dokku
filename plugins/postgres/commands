@@ -59,6 +59,38 @@ function connect_to_db() {
 
 case "$1" in
 
+  postgres:backups)
+	if [[ -d "$DOKKU_ROOT/.postgresql/backups_$APP" ]]; then
+		backup_found=false
+		for filepath in "$DOKKU_ROOT/.postgresql/backups_$APP/*.sql"; do
+			backup_found=true
+			filename=${filepath##*/}
+			echo $filename
+		done
+		if ! $backup_found; then
+			echo "There are no backups for $APP"
+		fi
+	else
+		echo "There are no backups for $APP"
+	fi
+    ;;
+
+  postgres:backups:create)
+	mkdir -p "$DOKKU_ROOT/.postgresql/backups_$APP"
+	timestamp=$(date +"%Y-%m-%d-%H.%M.%S")
+	backup_file="$DOKKU_ROOT/.postgresql/backups_$APP/$timestamp.sql"
+	dokku postgres:dump $APP > $backup_file
+	;;
+
+  postgres:backups:disable)
+  	# Disable automatic backups
+  	;;
+
+  postgres:backups:enable)
+	mkdir -p "$DOKKU_ROOT/.postgresql/backups_$APP"
+
+	;;
+
   postgres:console)
     check_postgresql_container
     check_postgresql_tool psql
@@ -232,6 +264,10 @@ case "$1" in
 
   help)
     cat && cat<<EOF
+    postgres:backups <db>				List available backups
+    postgres:backups:create <db>			Create a new database backup
+    postgres:backups:disable <db>			Disable automatic daily backups
+    postgres:backups:enable <db>			Enable automatic daily backups
     postgres:console <db>				Open a PostgreSQL console
     postgres:create <db>				Create a PostgreSQL container
     postgres:delete <db>				Delete specified PostgreSQL container
