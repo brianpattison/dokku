@@ -90,7 +90,7 @@ case "$1" in
 	if [[ -f $backup_path ]]; then
 		cat $backup_path 1>&2
 	else
-		echo "Backup could not be found"
+		echo "Backup $backup_path not be found"
 	fi
 	;;
 
