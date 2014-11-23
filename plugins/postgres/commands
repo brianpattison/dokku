@@ -73,7 +73,8 @@ case "$1" in
 	timestamp=$(date +"%Y-%m-%d-%H.%M.%S")
 	backup_file="$DOKKU_ROOT/.postgresql/backups_$APP/$timestamp.sql"
 	dokku postgres:dump $APP > $backup_file
-	echo "TODO: Delete old backups"
+	# Keep the 20 newest backups and delete the rest
+	cd "$DOKKU_ROOT/.postgresql/backups_$APP" && ls -t | grep .sql | sed -e '1,19d' | xargs -d '\n' rm
 	;;
 
   postgres:backups:disable)
