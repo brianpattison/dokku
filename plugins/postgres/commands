@@ -85,7 +85,13 @@ case "$1" in
   	;;
 
   postgres:backups:download)
-	cd "$DOKKU_ROOT/.postgresql/backups_$APP" && cat "$3"
+    backup_name="$3"
+	backup_path="$DOKKU_ROOT/.postgresql/backups_$APP/$backup_name"
+	if [[ -f $backup_path ]]; then
+		cat $backup_path 1>&2
+	else
+		echo "Backup $backup_path not be found"
+	fi
 	;;
 
   postgres:backups:enable)
