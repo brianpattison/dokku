@@ -70,7 +70,7 @@ case "$1" in
 
   postgres:backups:create)
 	mkdir -p "$DOKKU_ROOT/.postgresql/backups_$APP"
-	timestamp=$(date +"%Y-%m-%d-%H.%M.%S")
+	timestamp=$(date +"%Y-%m-%d-%H:%M:%S")
 	backup_file="$DOKKU_ROOT/.postgresql/backups_$APP/$timestamp.sql"
 	dokku postgres:dump $APP > $backup_file
 	# Keep the 20 newest backups and delete the rest
