@@ -79,7 +79,7 @@ case "$1" in
 
   postgres:backups:disable)
 	crontab -l | while read -r; do
-		[[ $REPLY = *"00 03 * * * dokku postgres:backups:create $APP"* ]] && continue
+		[[ $REPLY = *"0 3 * * * dokku postgres:backups:create $APP"* ]] && continue
 		printf '%s\n' "$REPLY"
 	done | crontab -
   	;;
@@ -97,7 +97,7 @@ case "$1" in
   postgres:backups:enable)
 	mkdir -p "$DOKKU_ROOT/.postgresql/backups_$APP"
 	dokku postgres:backups:disable $APP
-	crontab -l | { cat; echo "00 03 * * * dokku postgres:backups:create $APP"; } | crontab -
+	crontab -l | { cat; echo "0 3 * * * dokku postgres:backups:create $APP"; } | crontab -
 	;;
 
   postgres:console)
