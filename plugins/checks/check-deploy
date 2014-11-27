@@ -50,7 +50,7 @@ do
 			success=true
 			echo "       HTTP/1.1 200 OK" && break
 		elif [[ "$output" =~ "https://localhost" ]]; then
-			echo "       Do not force SSL in your app. Instead use the 'dokku ssl:force' command"
+			echo "====== Do not force SSL in your app. Instead use the 'dokku ssl:force' command ======"
 		fi
 
 	fi
