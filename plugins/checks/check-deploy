@@ -34,7 +34,8 @@ sleep $WAIT
 # -q           do not use .curlrc (must come first)
 # --compressed Test compression handled correctly
 # --location   Follow redirects
-CURL_OPTIONS="-q --compressed --location --max-time 30"
+# --insecure   Ignore SSL warnings because localhost is being used
+CURL_OPTIONS="-q --compressed --location --insecure --max-time 30"
 URL="http://localhost:$PORT/"
 
 if [[ -f $DOKKU_ROOT/$APP/tls/server.key ]] && [[ -f $DOKKU_ROOT/$APP/tls/server.crt ]]; then
@@ -66,7 +67,7 @@ do
 done
 
 if $success ; then
-	echo -e "       \033[32m\033[1mAll checks successful!\033[0m"
+	echo -e "       \033[32m\033[1mApp loaded successfully!\033[0m"
 else
 	echo "Failed to load after $max_attempts attempts."
 	new_container_id=$(docker ps | grep 0.0.0.0:$PORT | awk '{print $1}')
