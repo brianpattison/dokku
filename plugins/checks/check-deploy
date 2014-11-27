@@ -49,18 +49,21 @@ do
 		if [[ "$output" =~ "HTTP/1.1 200 OK" ]]; then
 			success=true
 			echo "       HTTP/1.1 200 OK" && break
-		elif [[ "$output" =~ "https://localhost" ]]; then
-			echo "====== Do not force SSL in your app. Instead use the 'dokku ssl:force' command ======"
 		fi
 
 	fi
 	attempts=$[$attempts+1]
-	echo "       Expected HTTP/1.1 200 OK. Bad Response:"
-	echo
-	echo "       $output"
-	echo
-	echo "       Trying again in $WAIT seconds ..."
-	sleep $WAIT
+
+	if [[ "$output" =~ "https://localhost" ]]; then
+		echo "====== Do not force SSL in your app. Instead use the 'dokku ssl:force' command ======" && break
+	else
+		echo "       Expected HTTP/1.1 200 OK. Bad Response:"
+		echo
+		echo "       $output"
+		echo
+		echo "       Trying again in $WAIT seconds ..."
+		sleep $WAIT
+	fi
 done
 
 if $success ; then
