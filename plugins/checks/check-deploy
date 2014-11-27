@@ -34,13 +34,8 @@ sleep $WAIT
 # -q           do not use .curlrc (must come first)
 # --compressed Test compression handled correctly
 # --location   Follow redirects
-# --insecure   Ignore SSL warnings because localhost is being used
 CURL_OPTIONS="-q --compressed --location --insecure --max-time 30"
 URL="http://localhost:$PORT/"
-
-if [[ -f $DOKKU_ROOT/$APP/tls/server.key ]] && [[ -f $DOKKU_ROOT/$APP/tls/server.crt ]]; then
-	URL="https://localhost:$PORT/"
-fi
 
 attempts=0
 max_attempts=5
@@ -54,6 +49,8 @@ do
 		if [[ "$output" =~ "HTTP/1.1 200 OK" ]]; then
 			success=true
 			echo "       HTTP/1.1 200 OK" && break
+		elif [[ "$output" =~ "https://localhost" ]]; then
+			echo "       Do not force SSL in your app. Instead use the 'dokku ssl:force' command"
 		fi
 
 	fi
