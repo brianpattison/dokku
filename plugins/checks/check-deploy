@@ -37,6 +37,10 @@ sleep $WAIT
 CURL_OPTIONS="-q --compressed --location --max-time 30"
 URL="http://localhost:$PORT/"
 
+if [[ -f $DOKKU_ROOT/$APP/tls/server.key ]] && [[ -f $DOKKU_ROOT/$APP/tls/server.crt ]]; then
+	URL="https://localhost:$PORT/"
+fi
+
 attempts=0
 max_attempts=5
 success=false
