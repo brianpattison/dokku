@@ -52,7 +52,7 @@ case "$1" in
     ;;
 
   ssl:delete)
-    rm -f "$APP_DIR/tls/server.crt" "$APP_DIR/tls/server.key"
+    rm -f "$APP_DIR/tls/server.crt" "$APP_DIR/tls/server.key" "$APP_DIR/tls/SSL_DOMAIN"
     dokku deploy "$APP"
     ;;
 
