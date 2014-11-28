@@ -30,8 +30,9 @@ case "$1" in
     ;;
 
   ssl:force)
+    SSL_DOMAIN="$3"
     mkdir -p "$APP_DIR/tls"
-    touch "$APP_DIR/tls/SSL_FORCE_ALL"
+    echo $SSL_DOMAIN > "$APP_DIR/tls/SSL_DOMAIN"
     ;;
 
   ssl:key)
@@ -58,7 +59,7 @@ case "$1" in
   help)
     cat && cat<<EOF
     ssl:certificate <app>				Pipe signed certifcate with all intermediates for an app
-    ssl:force <app>					Force SSL for all requests
+    ssl:force <app> <domain>				Force SSL for all requests using given domain
     ssl:key <app>					Pipe private key for an app
     ssl:info <app>					Show info about certifcate and certificate request
     ssl:delete <app>					Wipes certificate for an app

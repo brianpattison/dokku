@@ -59,9 +59,10 @@ EOF
 EOF
 )
 
-  if [[ -e "$SSL/SSL_FORCE_ALL" ]]; then
+  if [[ -f "$SSL/SSL_DOMAIN" ]]; then
+    SSL_DOMAIN=$(< "$SSL/SSL_DOMAIN")
     SSL_UNSECURE_LOCATION=$(cat <<EOF
-  return 301 https://\$server_name\$request_uri;
+  return 301 https://$SSL_DOMAIN\$request_uri;
 EOF
 )
   fi
