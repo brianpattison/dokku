@@ -72,7 +72,7 @@ case "$1" in
 	mkdir -p "$DOKKU_ROOT/.postgresql/backups_$APP"
 	timestamp=$(date +"%Y-%m-%d-%H:%M:%S")
 	backup_file="$DOKKU_ROOT/.postgresql/backups_$APP/$timestamp.sql"
-	dokku postgres:dump $APP > $backup_file
+	/usr/local/bin/dokku postgres:dump $APP > $backup_file
 	# Keep the 20 newest backups and delete the rest
 	cd "$DOKKU_ROOT/.postgresql/backups_$APP" && ls -t | grep .sql | sed -e '1,20d' | xargs -d '\n' rm
 	;;
@@ -96,7 +96,7 @@ case "$1" in
 
   postgres:backups:enable)
 	mkdir -p "$DOKKU_ROOT/.postgresql/backups_$APP"
-	dokku postgres:backups:disable $APP
+	/usr/local/bin/dokku postgres:backups:disable $APP
 	crontab -l | { cat; echo "0 3 * * * /usr/local/bin/dokku postgres:backups:create $APP"; } | crontab -
 	;;
 
