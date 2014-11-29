@@ -73,7 +73,7 @@ EOF
   }
 
   location / {
-    rewrite ^ $SSL_DOMAIN$request_uri? permanent;
+    rewrite ^ $SSL_DOMAIN\$request_uri? permanent;
   }
 EOF
 )
