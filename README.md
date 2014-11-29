@@ -1,154 +1,45 @@
 # Dokku
 
-Docker powered mini-Heroku. The smallest PaaS implementation you've ever seen.
+This is a modified version of [Dokku](https://github.com/progrium/dokku) used by
+[Dokku Installer](https://dokku.net).
 
-[![Build Status](https://travis-ci.org/progrium/dokku.png?branch=master)](https://travis-ci.org/progrium/dokku)
+## Dokku Installer
 
-## Requirements
+[Dokku Installer](https://dokku.net) is a web based interface for spinning up servers
+with this version of Dokku already installed. Most of the additional tools included
+with the install are specific to Rails apps.
 
-Assumes Ubuntu 13 x64 right now. Ideally have a domain ready to point to your host. It's designed for and is probably
-best to use a fresh VM. The bootstrapper will install everything it needs.
+## Dokku Installer CLI
 
-**Note: There are known issues with docker and Ubuntu 13.10 ([1](https://github.com/dotcloud/docker/issues/1300), [2](https://github.com/dotcloud/docker/issues/1906)) - use of 13.04 is recommended until these issues are resolved.**
+[Dokku Installer CLI](https://github.com/brianpattison/dokku-installer-cli) is the
+command line tool that only works with this version of Dokku and simplifies the
+commands available on your local machine.
 
-## Installing
-
-### Stable
-
-    $ wget -qO - https://raw.github.com/progrium/dokku/v0.2.0/bootstrap.sh | sudo DOKKU_TAG=v0.2.0 bash
-
-### Development
-
-    $ wget -qO- https://raw.github.com/progrium/dokku/master/bootstrap.sh | sudo bash
-
-This may take around 5 minutes. Certainly better than the several hours it takes to bootstrap Cloud Foundry.
-
-You may also wish to take a look at the [advanced installation](http://progrium.viewdocs.io/dokku/advanced-installation) document for aditional installation options.
-
-## Configuring
-
-Set up a domain and a wildcard domain pointing to that host. Make sure `/home/dokku/VHOST` is set to this domain. By default it's set to whatever the hostname the host has. This file only created if the hostname can be resolved by dig (`dig +short $HOSTNAME`). Otherwise you have to create the file manually and set it to your prefered domain. If this file still not present when you push your app, dokku will publish the app with a port number (i.e. `http://example.com:49154` - note the missing subdomain).
-
-You'll have to add a public key associated with a username by doing something like this from your local machine:
-
-    $ cat ~/.ssh/id_rsa.pub | ssh progriumapp.com "sudo sshcommand acl-add dokku progrium"
-
-That's it!
-
-## Deploy an App
-
-Now you can deploy apps on your Dokku. Let's deploy the [Heroku Node.js sample app](https://github.com/heroku/node-js-sample). All you have to do is add a remote to name the app. It's created on-the-fly.
-
-    $ cd node-js-sample
-    $ git remote add progrium dokku@progriumapp.com:node-js-app
-    $ git push progrium master
-    Counting objects: 296, done.
-    Delta compression using up to 4 threads.
-    Compressing objects: 100% (254/254), done.
-    Writing objects: 100% (296/296), 193.59 KiB, done.
-    Total 296 (delta 25), reused 276 (delta 13)
-    -----> Building node-js-app ...
-           Node.js app detected
-    -----> Resolving engine versions
-
-    ... blah blah blah ...
-
-    -----> Application deployed:
-           http://node-js-app.progriumapp.com
-
-You're done!
-
-Right now Buildstep supports buildpacks for Node.js, Ruby, Python, [and more](https://github.com/progrium/buildstep#supported-buildpacks). It's not hard to add more, [go add more](https://github.com/progrium/buildstep#adding-buildpacks)!
-Please check the documentation for your particular build pack as you may need to include configuration files (such as a Procfile) in your project root.
-
-## Remote commands
-
-Dokku commands can be run over ssh. Anywhere you would run `dokku <command>`, just run `ssh -t dokku@progriumapp.com <command>`
-The `-t` is used to request a pty. It is highly recommended to do so.
-To avoid the need to type the `-t` option each time, simply create/modify a section in the `.ssh/config`, on the client side, as follows :
-
-    Host progriumapp.com
-    RequestTTY yes
-
-## Run a command in the app environment
-
-It's possible to run commands in the environment of the deployed application:
-
-    $ dokku run node-js-app ls -alh
-    $ dokku run <app> <cmd>
-
-## Plugins
-
-Dokku itself is built out of plugins. Checkout the wiki for information about
-creating your own and a list of existing plugins:
-
-https://github.com/progrium/dokku/wiki/Plugins
-
-## Removing a deployed app
-
-SSH onto the server, then execute:
-
-    $ dokku delete myapp
-
-## Environment variable management
-
-Typically an application will require some environment variables to run properly. Environment variables may contain private data, such as passwords or API keys, so it is not recommend to store them in your application's repository.
-
-The `config` plugin provides the following commands to manage your variables:
 ```
-config <app> - display the config vars for an app  
-config:get <app> KEY - display a config value for an app  
-config:set <app> KEY1=VALUE1 [KEY2=VALUE2 ...] - set one or more config vars
-config:unset <app> KEY1 [KEY2 ...] - unset one or more config vars
+$ dokku help
+
+Commands:
+  dokku config                                    # Display the app's environment variables
+  dokku config:get KEY                            # Display an environment variable value
+  dokku config:set KEY1=VALUE1 [KEY2=VALUE2 ...]  # Set one or more environment variables
+  dokku config:unset KEY1 [KEY2 ...]              # Unset one or more environment variables
+  dokku domains                                   # Display the app's domains
+  dokku domains:set DOMAIN1 [DOMAIN2 ...]         # Set one or more domains
+  dokku help [COMMAND]                            # Describe available commands or one specific command
+  dokku logs [-t]                                 # Show the last logs for the application (-t follows)
+  dokku open                                      # Open the application in your default browser
+  dokku postgres:backups                          # List available PostgreSQL backups
+  dokku postgres:backups:create                   # Create a new PostgreSQL backup
+  dokku postgres:backups:disable                  # Disable daily PostgreSQL backups
+  dokku postgres:backups:download <number>        # Download the numbered PostgreSQL backup
+  dokku postgres:backups:enable                   # Enable daily PostgreSQL backups
+  dokku postgres:backups:restore:local <number>   # Restore the numbered PostgreSQL backup locally
+  dokku restart                                   # Restart the application
+  dokku run <cmd>                                 # Run a command in the environment of the application
+  dokku ssh                                       # Start an SSH session as root user
+  dokku ssl:add CRT KEY                           # Add an SSL endpoint.
+  dokku ssl:force DOMAIN                          # Force SSL on the given domain.
+  dokku ssl:remove                                # Remove an SSL endpoint.
+  dokku url                                       # Show the URL for the application
+  dokku version                                   # Show dokku-installer-cli's version
 ```
-
-## SSL support
-
-Dokku provides easy SSL support from the box. To enable SSL connection to your application, copy `.crt` and `.key` file into `/home/dokku/:app/ssl` folder (notice, file names should be `server.crt` and `server.key`, respectively). Redeployment of application will be needed to apply SSL configuration. Once it redeployed, application will be accessible by `https://` (redirection from `http://` is applied as well).
-
-## Upgrading
-
-Dokku is in active development. You can update the deployment step and the build step separately.
-
-**Note**: If you are upgrading from a revision prior to [27d4bc8c3c](https://github.com/progrium/dokku/commit/27d4bc8c3c19fe580ef3e65f2f85b85101cd83e4), follow the instructions in [this wiki entry](https://github.com/progrium/dokku/wiki/Migrating-to-Dokku-0.2.0).
-
-To update the deploy step (this is updated less frequently):
-
-    $ cd ~/dokku
-    $ git pull origin master
-    $ sudo make install
-
-Nothing needs to be restarted. Changes will take effect on the next push / deployment.
-
-To update the build step:
-
-    $ git clone https://github.com/progrium/buildstep.git
-    $ cd buildstep
-    $ git pull origin master
-    $ sudo make build
-
-This will build a fresh Ubuntu Quantal image, install a number of packages, and
-eventually replace the Docker image for buildstep.
-
-## Support
-
-You can use [Github Issues](https://github.com/progrium/dokku/issues), check [Troubleshooting](https://github.com/progrium/dokku/wiki/Troubleshooting) on the wiki, or join us on Freenode in #dokku
-
-## Components
-
- * [Docker](https://github.com/dotcloud/docker) - Container runtime and manager
- * [Buildstep](https://github.com/progrium/buildstep) - Buildpack builder
- * [pluginhook](https://github.com/progrium/pluginhook) - Shell based plugins and hooks
- * [sshcommand](https://github.com/progrium/sshcommand) - Fixed commands over SSH
-
-Looking to keep codebase as simple and hackable as possible, so try to keep your line count down.
-
-## Things this project won't do
-
- * **Multi-host.** Not a huge leap, but this isn't the project for it. Have a look at [Flynn](https://flynn.io/).
- * **Multitenancy.** It's ready for it, but again, have a look at [Flynn](https://flynn.io/).
- * **Client app.** Given the constraints, running commands remotely via SSH is fine.
-
-## License
-
-MIT
