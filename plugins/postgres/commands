@@ -101,6 +101,16 @@ case "$1" in
 	crontab -l | { cat; echo "0 3 * * * /usr/local/bin/dokku postgres:backups:create $APP"; } | crontab -
 	;;
 
+  postgres:backups:restore)
+	backup_name="$3"
+	backup_path="$DOKKU_ROOT/.postgresql/backups_$APP/$backup_name"
+	if [[ -f $backup_path ]]; then
+		dokku postgres:restore $APP < $backup_path
+	else
+		echo "Backup $backup_path not be found"
+	fi
+  	;;
+
   postgres:console)
     check_postgresql_container
     check_postgresql_tool psql
