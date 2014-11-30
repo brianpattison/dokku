@@ -72,6 +72,6 @@ ufw:
 	ufw allow 22/tcp
 	ufw allow 80/tcp
 	ufw allow 443/tcp
-	ufw allow from 172.17.42.1/16 to 172.17.42.1/16
+	ufw allow from 172.17.0.0/16 to 172.17.0.0/16
 	sed -i 's/DEFAULT_FORWARD_POLICY=\"DROP\"/DEFAULT_FORWARD_POLICY=\"ACCEPT\"/g' /etc/default/ufw
 	ufw -f enable
