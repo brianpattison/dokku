@@ -155,11 +155,11 @@ case "$1" in
     fi
 
     # Link to a potential existing app
+	dokku postgres:backups:enable $APP
     dokku postgres:link $APP $APP
     echo
     echo "-----> PostgreSQL container created: $DB_IMAGE"
     sleep 1
-    dokku postgres:backups:enable $APP
     dokku postgres:info $APP
     ;;
 

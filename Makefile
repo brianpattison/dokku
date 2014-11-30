@@ -1,4 +1,4 @@
-DOKKU_VERSION = v0.1.2
+DOKKU_VERSION = v0.1.3
 
 SSHCOMMAND_URL ?= https://raw.github.com/brianpattison/sshcommand/master/sshcommand
 PLUGINHOOK_URL ?= http://brianpattison.s3.amazonaws.com/pluginhook_0.1.0_amd64.deb
@@ -10,7 +10,7 @@ DOKKU_ROOT ?= /home/dokku
 all:
 	# Type "make install" to install.
 
-install: dependencies stack copyfiles plugin-dependencies plugins version
+install: dependencies stack copyfiles plugin-dependencies plugins version ufw
 
 copyfiles:
 	cp dokku /usr/local/bin/dokku
@@ -65,3 +65,13 @@ count:
 	@find plugins -type f | xargs cat | wc -l
 	@echo "Test lines:"
 	@find tests -type f | xargs cat | wc -l
+
+ufw:
+	ufw default deny incoming
+	ufw default allow outgoing
+	ufw allow 22/tcp
+	ufw allow 80/tcp
+	ufw allow 443/tcp
+	ufw allow from 172.17.42.1/16 to 172.17.42.1/16
+	sed -i 's/DEFAULT_FORWARD_POLICY=\"DROP\"/DEFAULT_FORWARD_POLICY=\"ACCEPT\"/g' /etc/default/ufw
+	ufw -f enable
