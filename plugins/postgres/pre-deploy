@@ -44,6 +44,6 @@ if [[ -n $PG_APP_IMAGE_ID ]] && [[ -f $PG_VOLUME_PATH ]]; then
     fi
 
 	# Update DATABASE_URL environment variable
-	PG_PORT=$(docker port "$PG_APP_IMAGE_ID" 5432 | sed 's/0.0.0.0://')
+	PG_PORT=$(docker port "$PG_APP_CONTAINER_ID" 5432 | sed 's/0.0.0.0://')
 	dokku config:set:norestart $APP "DATABASE_URL=postgres://root:$DB_PASSWORD@172.17.42.1:$PG_PORT/db"
 fi

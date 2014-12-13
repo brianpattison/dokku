@@ -31,6 +31,6 @@ if [[ -n $REDIS_APP_IMAGE_ID ]] && [[ -f $REDIS_VOLUME_PATH ]]; then
     fi
 
 	# Update REDIS_URL environment variable
-	REDIS_PORT=$(docker port $REDIS_APP_IMAGE_ID 6379 | cut -d":" -f2)
+	REDIS_PORT=$(docker port "$REDIS_APP_CONTAINER_ID" 6379 | sed 's/0.0.0.0://')
 	dokku config:set:norestart $APP "REDIS_URL=redis://172.17.42.1:$REDIS_PORT"
 fi
