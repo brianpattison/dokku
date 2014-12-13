@@ -1,4 +1,4 @@
-DOKKU_VERSION = v0.1.6
+DOKKU_VERSION = v0.1.7
 
 SSHCOMMAND_URL ?= https://raw.github.com/brianpattison/sshcommand/master/sshcommand
 PLUGINHOOK_URL ?= http://brianpattison.s3.amazonaws.com/pluginhook_0.1.0_amd64.deb
