@@ -178,6 +178,10 @@ ${var}"
 			fi
 		done
 		ENV_ADD=$(echo "$ENV_ADD" | tail -n +2) #remove first empty line
+
+		echo "-----> Setting config vars $APP"
+		config_styled_hash "$ENV_ADD"
+		echo -e "$ENV_TEMP" | sed '/^$/d' | sort > $ENV_FILE
 	;;
 
 	config:unset)
