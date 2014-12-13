@@ -21,11 +21,11 @@ if [[ -n $REDIS_APP_IMAGE_ID ]] && [[ -f $REDIS_VOLUME_PATH ]]; then
     else
         echo "stopped."
 
-	REDIS_VOLUME="`cat $REDIS_VOLUME_PATH`:/var/lib/redis"
+		REDIS_VOLUME="`cat $REDIS_VOLUME_PATH`:/var/lib/redis"
 
         echo -n "       Launching $REDIS_APP_IMAGE... "
         echo "COMMAND: docker run -v $REDIS_VOLUME -p 6379 -d $REDIS_APP_IMAGE /bin/start_redis.sh"
-        ID=$(docker run -v $REDIS_VOLUME -p 6379 -d $REDIS_APP_IMAGE /bin/start_redis.sh)
+        REDIS_APP_CONTAINER_ID=$(docker run -v $REDIS_VOLUME -p 6379 -d $REDIS_APP_IMAGE /bin/start_redis.sh)
 		sleep 4
         echo "ok."
     fi
