@@ -5,6 +5,18 @@ echo "-----> Checking status of PostgreSQL"
 
 APP="$1"
 
+function get_postgresql_id() {
+    ID=$(docker ps | grep postgresql/"$APP":latest | awk {'print $1'})
+    echo $ID
+}
+
+function get_postgresql_port() {
+    ID=$(get_postgresql_id)
+    PORT=$(docker port "$ID" 5432 | sed 's/0.0.0.0://')
+    echo $PORT
+}
+
+
 PG_APP_IMAGE="postgresql/$APP"
 PG_VOLUME_PATH="$DOKKU_ROOT/.postgresql/volume_$APP"
 
@@ -30,4 +42,8 @@ if [[ -n $PG_APP_IMAGE_ID ]] && [[ -f $PG_VOLUME_PATH ]]; then
         sleep 1
         echo "ok."
     fi
+
+	# Update DATABASE_URL environment variable
+	PG_PORT=$(docker port "$PG_APP_IMAGE_ID" 5432 | sed 's/0.0.0.0://')
+	dokku config:set:norestart $APP "DATABASE_URL=postgres://root:$DB_PASSWORD@172.17.42.1:$PG_PORT/db"
 fi
