@@ -12,7 +12,6 @@ if [[ $RAKE_DB_MIGRATE == "true" ]]; then
 		sleep 5
 		IMAGE="dokku/$APP"
 		DOCKER_ARGS=$(: | pluginhook docker-args $APP)
-		docker run $DOCKER_ARGS $IMAGE /exec "rake db:migrate"
-		exit 0
+		docker run $DOCKER_ARGS $IMAGE /exec "rake db:migrate" && exit 0
 	fi
 fi
