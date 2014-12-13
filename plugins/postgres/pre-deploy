@@ -28,12 +28,12 @@ if [[ -n $PG_APP_IMAGE_ID ]] && [[ -f $PG_VOLUME_PATH ]]; then
     echo -n "       Checking status... "
 
     PG_APP_CONTAINER_ID=$(docker ps | grep "$PG_APP_IMAGE" |  awk '{print $1}')
+	DB_PASSWORD=$(cat "$DOKKU_ROOT/.postgresql/pwd_$APP")
+
     if [[ -n $PG_APP_CONTAINER_ID ]]; then
         echo "ok."
     else
         echo "stopped."
-
-		DB_PASSWORD=$(cat "$DOKKU_ROOT/.postgresql/pwd_$APP")
 		PG_VOLUME="`cat $PG_VOLUME_PATH`:/opt/postgresql"
 
         echo -n "       Launching $PG_APP_IMAGE... "
